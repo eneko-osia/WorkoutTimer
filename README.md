@@ -93,14 +93,6 @@ WorkoutTimer/
 
 ---
 
-## 🧪 Testing
-
-Testing setup not included yet. Suggestions:
-- Jest for unit tests
-- Detox for end-to-end testing
-
----
-
 ## 📄 License
 
 MIT License
@@ -109,4 +101,5 @@ MIT License
 
 ## 🙌 Contributing
 
-Feel free to fork and submit PRs. Feedback and contributions are welcome!
+Feel free to fork and submit PRs. 
+Feedback and contributions are welcome!
