@@ -12,10 +12,10 @@ import { RootStackParamList } from '../navigation/types';
 import { theme } from '../styles/theme';
 import { useStyles } from '../styles/common';
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
+type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
 export default function HomeScreen() {
-    const navigation = useNavigation<NavigationProp>();
+    const navigation = useNavigation<HomeScreenNavigationProp>();
     return (
         <View style = {style.container}>
             <Text style = {style.titleText}>Workouts</Text>

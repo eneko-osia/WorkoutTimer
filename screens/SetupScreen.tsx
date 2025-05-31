@@ -16,10 +16,10 @@ import { TimerBlock } from '../components/TimerBlock';
 import { TimerBlockData } from '../types/timer';
 import { useStyles } from '../styles/common';
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Setup'>;
+type SetupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Setup'>;
 
 export default function SetupScreen() {
-    const navigation = useNavigation<NavigationProp>();
+    const navigation = useNavigation<SetupScreenNavigationProp>();
     const [blocks, setBlocks] = useState<TimerBlockData[]>([]);
 
     const addBlock = () => {
