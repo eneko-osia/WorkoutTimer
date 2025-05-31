@@ -1,0 +1,56 @@
+# Node modules
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+expo-debug.log
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Expo files
+.expo/
+.expo-shared/
+
+# Build outputs
+dist/
+build/
+android/app/build/
+ios/build/
+
+# React Native
+*.keystore
+*.jks
+
+# Bundler/Metro cache
+metro-cache/
+.babelrc
+babel.config.js
+
+# Environment variables
+.env
+.env.*
+
+# VSCode
+.vscode/
+
+# TypeScript
+*.tsbuildinfo
+
+# Jest
+coverage/
+jest-cache/
+jest.config.js
+
+# Watchman
+.watchmanconfig
+
+# macOS
+*.swp
+
+# CocoaPods
+ios/Pods/
+ios/Podfile.lock
