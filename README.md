@@ -59,6 +59,8 @@ expo start
 - Scan the QR code with Expo Go on your phone
 - Or press i (iOS) / a (Android) in terminal
 
+---
+
 ## 📂 Project Structure
 
 ```bash
@@ -73,10 +75,13 @@ expo start
 ├── MainApp.tsx        # Navigation container
 └── README.md
 ```
+---
 
 ## 📄 License
 
 MIT License
+
+---
 
 ## 🙌 Contributing
 
