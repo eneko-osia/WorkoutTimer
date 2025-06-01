@@ -1,7 +1,7 @@
-import { TimerBlockData } from '../types/timer';
+import { Workout } from '../types/workout';
 
 export type RootStackParamList = {
     Home: undefined;
     Setup: undefined;
-    Timer: { blocks: TimerBlockData[] };
+    Timer: { workout: Workout };
 };

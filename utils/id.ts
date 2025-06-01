@@ -1,1 +1,1 @@
-export const generateId = () => Date.now().toString() + Math.random().toString(36).substring(2);
+export const generateId = () => { return Date.now() + Math.floor(Math.random() * 1000); }
