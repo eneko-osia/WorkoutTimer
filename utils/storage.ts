@@ -1,0 +1,29 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { Workout } from '../types/workout';
+
+export async function deleteWorkout(key: string, id: number): Promise<void> {
+    const workouts = await loadWorkouts(key);
+    saveWorkouts(key, workouts.filter(w => w.id !== id))
+}
+
+export async function loadWorkouts(key: string): Promise<Workout[]> {
+    const json = await AsyncStorage.getItem(key);
+    if (!json) { return []; }
+    try {
+        const parsed = JSON.parse(json);
+        return parsed.map((data: any) => Workout.fromJSON(data));
+    } catch (e) {
+        console.error('Failed to parse workouts:', e);
+        return [];
+    }
+}
+
+export async function saveWorkout(key: string, workout: Workout): Promise<void> {
+    const workouts = await loadWorkouts(key);
+    saveWorkouts(key, [...workouts.filter(w => w.id !== workout.id), workout])
+}
+
+export async function saveWorkouts(key: string, workouts: Workout[]): Promise<void> {
+    await AsyncStorage.setItem(key, JSON.stringify(workouts));
+}

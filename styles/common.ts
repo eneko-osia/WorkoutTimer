@@ -4,76 +4,129 @@ import { scale } from 'react-native-size-matters';
 import { Theme } from './theme';
 
 export const useStyles = (theme: Theme) => StyleSheet.create({
-    // container
-    container: {
-        backgroundColor: theme.colors.background,
-        borderColor: theme.colors.border,
-        borderRadius: theme.borderRadius.md,
-        borderWidth: scale(1),
-        margin: theme.spacing.xs,
-        padding: theme.spacing.xs,
+    // alignment
+    center: {
+        textAlign: 'center',
+    },
+    left: {
+        textAlign: 'left',
+    },
+    right: {
+        textAlign: 'right',
     },
 
-    rowContainer: {
-        alignItems: 'center',
-        backgroundColor: theme.colors.background,
+    // borders
+    border: {
         borderColor: theme.colors.border,
         borderRadius: theme.borderRadius.md,
-        borderWidth: scale(1),
-        flexDirection: 'row',
-        justifyContent: 'center',
-        margin: theme.spacing.xs,
-        padding: theme.spacing.xs,
     },
 
-    subBlockContainer: {
-        backgroundColor: theme.colors.success,
-        borderColor: theme.colors.border,
-        borderRadius: theme.borderRadius.md,
+    outline: {
         borderWidth: scale(1),
-        margin: theme.spacing.xs,
-        padding: theme.spacing.xs,
     },
 
-    // button
+    // buttons
     button: {
         alignItems: 'center',
-        backgroundColor: theme.colors.primary,
-        borderColor: theme.colors.border,
-        borderRadius: theme.borderRadius.md,
-        borderWidth: scale(1),
-        marginBottom: theme.spacing.xs,
-        marginTop: theme.spacing.xs,
-        padding: theme.spacing.xs,
     },
 
-    buttonDisabled: {
-        alignItems: 'center',
-        backgroundColor: theme.colors.primary,
-        borderColor: theme.colors.border,
-        borderRadius: theme.borderRadius.md,
-        borderWidth: scale(1),
-        marginBottom: theme.spacing.xs,
-        marginTop: theme.spacing.xs,
+    disabled: {
         opacity: 0.5,
+    },
+
+    // colors
+    primary: {
+        backgroundColor: theme.colors.primary,
+    },
+    secondary: {
+        backgroundColor: theme.colors.secondary,
+    },
+    tertiary: {
+        backgroundColor: theme.colors.tertiary,
+    },
+    quaternary: {
+        backgroundColor: theme.colors.quaternary,
+    },
+
+    // containers
+    row: {
+        alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'center',
+    },
+
+    // flex
+    flex1: {
+        flex: 1,
+    },
+    flex2: {
+        flex: 2,
+    },
+    flex3: {
+        flex: 3,
+    },
+    flex4: {
+        flex: 4,
+    },
+
+    // spacing
+    margin: {
+        margin: theme.spacing.xs,
+    },
+    marginHorizontal: {
+        marginHorizontal: theme.spacing.xs,
+    },
+    marginVertical: {
+        marginVertical: theme.spacing.xs,
+    },
+    marginBottom: {
+        marginBottom: theme.spacing.xs,
+    },
+    marginTop: {
+        marginTop: theme.spacing.xs,
+    },
+    marginLeft: {
+        marginLeft: theme.spacing.xs,
+    },
+    marginRight: {
+        marginRight: theme.spacing.xs,
+    },
+    padding: {
         padding: theme.spacing.xs,
+    },
+    paddingHorizontal: {
+        paddingHorizontal: theme.spacing.xs,
+    },
+    paddingVertical: {
+        paddingVertical: theme.spacing.xs,
+    },
+    paddingBottom: {
+        paddingBottom: theme.spacing.xs,
+    },
+    paddingTop: {
+        paddingTop: theme.spacing.xs,
+    },
+    paddingLeft: {
+        marginLeft: theme.spacing.xs,
+    },
+    paddingRight: {
+        marginRight: theme.spacing.xs,
     },
 
     // text
-    buttonText: {
-        borderColor: theme.colors.border,
-        borderRadius: theme.borderRadius.md,
-        borderWidth: scale(1),
+    text: {
         color: theme.colors.text,
+        overflow: 'scroll'
+    },
+    normal: {
         fontSize: theme.fontSizes.md,
         fontWeight: 'bold',
     },
-
-    titleText: {
-        borderColor: theme.colors.border,
-        borderRadius: theme.borderRadius.md,
-        borderWidth: scale(1),
-        color: theme.colors.text,
+    small: {
+        fontSize: theme.fontSizes.sm,
+        fontWeight: 'bold',
+    },
+    large: {
         fontSize: theme.fontSizes.lg,
         fontWeight: 'bold',
     },

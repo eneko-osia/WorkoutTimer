@@ -17,13 +17,14 @@ export class Workout {
     static readonly kMaxSets: number = 99;
     static readonly kMinDuration: number = 1
     static readonly kMaxDuration: number = 3600
+    static readonly kStorageKey: string = 'workouts';
 
     private _id: number;
     private _name: string;
     private _blocks: TimerBlock[];
 
     constructor({id, name, blocks = []}: {id: number; name: string; blocks?: TimerBlock[];}) {
-        this._id = generateId();
+        this._id = id;
         this._name = name;
         this._blocks = blocks;
     }
@@ -34,6 +35,10 @@ export class Workout {
 
     get name(): string {
         return this._name;
+    }
+
+    set name(_name: string) {
+        this._name = _name;
     }
 
     get blocks(): readonly TimerBlock[] {
@@ -73,13 +78,13 @@ export class Workout {
         }
     }
 
-    fromJSON(data: any) {
-        this._id = data.id;
-        this._name = data.name;
-        this._blocks = data.blocks;
+    static fromJSON(data: any): Workout {
+        console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+        return new Workout(data);
     }
 
     toJSON(): any {
+        console.log('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb');
         return {
             id: this._id,
             name: this._name,
