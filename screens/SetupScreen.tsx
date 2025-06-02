@@ -31,9 +31,9 @@ export default function SetupScreen() {
     const route = useRoute<SetupScreenRouteProp>();
 
     // attributes
-    const { workout } = route.params;
-    const timer = useRef<NodeJS.Timeout>(null);
-    const [, forceUpdate] = useState(false);
+    const [ , forceUpdate ] = useState(false);
+    const { workout }       = route.params;
+    const timer             = useRef<NodeJS.Timeout>(null);
 
     // methods
     const createBlock = () => {

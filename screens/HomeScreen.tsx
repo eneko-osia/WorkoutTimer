@@ -31,7 +31,7 @@ export default function HomeScreen() {
     const navigation = useNavigation<HomeScreenNavigationProp>();
 
     // attributes
-    const [workouts, setWorkouts] = useState<Workout[]>([]);
+    const [ workouts, setWorkouts ] = useState<Workout[]>([]);
 
     // effects
     useFocusEffect(

@@ -116,10 +116,17 @@ export const useStyles = (theme: Theme) => StyleSheet.create({
     // text
     text: {
         color: theme.colors.text,
-        overflow: 'scroll'
     },
     normal: {
         fontSize: theme.fontSizes.md,
+        fontWeight: 'bold',
+    },
+    xxsmall: {
+        fontSize: theme.fontSizes.xxs,
+        fontWeight: 'bold',
+    },
+    xsmall: {
+        fontSize: theme.fontSizes.xs,
         fontWeight: 'bold',
     },
     small: {
@@ -128,6 +135,14 @@ export const useStyles = (theme: Theme) => StyleSheet.create({
     },
     large: {
         fontSize: theme.fontSizes.lg,
+        fontWeight: 'bold',
+    },
+    xlarge: {
+        fontSize: theme.fontSizes.xl,
+        fontWeight: 'bold',
+    },
+    xxlarge: {
+        fontSize: theme.fontSizes.xxl,
         fontWeight: 'bold',
     },
 });

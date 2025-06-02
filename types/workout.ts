@@ -79,12 +79,10 @@ export class Workout {
     }
 
     static fromJSON(data: any): Workout {
-        console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
         return new Workout(data);
     }
 
     toJSON(): any {
-        console.log('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb');
         return {
             id: this._id,
             name: this._name,
