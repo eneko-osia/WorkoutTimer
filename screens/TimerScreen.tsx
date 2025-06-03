@@ -1,5 +1,10 @@
 // react imports
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+    RefObject,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
 import {
     StyleSheet,
     Text,
@@ -7,6 +12,7 @@ import {
 } from 'react-native';
 import { Audio } from 'expo-av';
 import { RouteProp, useRoute } from '@react-navigation/native';
+import { useKeepAwake } from 'expo-keep-awake';
 
 // project imports
 import { formatDuration } from '../utils/format';
@@ -15,13 +21,16 @@ import { theme } from '../styles/theme';
 import { useStyles } from '../styles/common';
 
 // type definitions
+type SoundRef = RefObject<Audio.Sound | null>;
 type TimerScreenRouteProp = RouteProp<RootStackParamList, 'Timer'>;
 
 // screen
 export default function TimerScreen() {
     // hooks
+    const beepLongSound = useRef<Audio.Sound | null>(null);
+    const beepSound = useRef<Audio.Sound | null>(null);
     const route = useRoute<TimerScreenRouteProp>();
-    const sound = useRef<Audio.Sound>(null);
+    useKeepAwake();
 
     // attributes
     const [ blockIndex, setBlockIndex ]         = useState(0);
@@ -50,13 +59,17 @@ export default function TimerScreen() {
     }, []);
 
     useEffect(() => {
-        const loadSound = async () => {
-            const { sound: loadedSound } = await Audio.Sound.createAsync(require('../assets/sounds/beep.wav'));
-            sound.current = loadedSound;
+        const loadSound = async (asset: number, soundRef: SoundRef) => {
+            const { sound: loadedSound } = await Audio.Sound.createAsync(asset);
+            soundRef.current = loadedSound;
         };
-        loadSound();
+        loadSound(require('../assets/sounds/beep.wav'), beepSound);
+        loadSound(require('../assets/sounds/beep_long.wav'), beepLongSound);
 
-        return () => { sound.current?.unloadAsync(); };
+        return () => {
+            beepLongSound.current?.unloadAsync();
+            beepSound.current?.unloadAsync();
+        };
     }, []);
 
     useEffect(() => {
@@ -74,6 +87,7 @@ export default function TimerScreen() {
             setElapsedTime((prev) => { return prev + 1});
             setTimeLeft((prev) => {
                 if (prev > 1) { return prev - 1; }
+                playSound(beepLongSound);
                 handleAdvance();
                 return 0;
             });
@@ -84,7 +98,7 @@ export default function TimerScreen() {
 
     useEffect(() => {
         if (timeLeft <= 3) {
-            playBeep();
+            playSound(beepSound);
         }
     }, [ timeLeft ]);
 
@@ -133,9 +147,11 @@ export default function TimerScreen() {
         return null; // No more valid blocks
     }
 
-    const playBeep = async () => {
+    const playSound = async (soundRef: SoundRef) => {
         try {
-            await sound.current?.replayAsync();
+            await soundRef.current?.setPositionAsync(0);
+            await soundRef.current?.playAsync();
+            // await sound.current?.replayAsync();
         } catch (err) {
             console.warn('Beep failed:', err);
         }
