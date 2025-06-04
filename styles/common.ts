@@ -118,6 +118,9 @@ export const useStyles = (theme: Theme) => {
         text: {
             color: theme.colors.text,
         },
+        input: { 
+            backgroundColor: theme.colors.input,
+        },
         normal: {
             fontSize: theme.fontSizes.md,
             fontWeight: 'bold',

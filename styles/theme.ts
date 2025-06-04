@@ -45,6 +45,7 @@ export const dark = {
         quaternary: '#ECDFCC',
         border:     '#FFFFFF',
         text:       '#181C14',
+        input:      '#FFFFFF',
     },
 };
 
@@ -57,6 +58,7 @@ export const light = {
         quaternary: '#FAFFCA',
         border:     '#E0E0E0',
         text:       '#333333',
+        input:      '#FFFFFF',
     },
 };
 
