@@ -8,6 +8,7 @@ import React, {
 import {
     StyleSheet,
     Text,
+    useColorScheme,
     View,
 } from 'react-native';
 import { Audio } from 'expo-av';
@@ -17,8 +18,8 @@ import { useKeepAwake } from 'expo-keep-awake';
 // project imports
 import { formatDuration } from '../utils/format';
 import { RootStackParamList } from '../navigation/types';
-import { theme } from '../styles/theme';
 import { useStyles } from '../styles/common';
+import { useTheme } from '../styles/theme';
 
 // type definitions
 type SoundRef = RefObject<Audio.Sound | null>;
@@ -27,10 +28,19 @@ type TimerScreenRouteProp = RouteProp<RootStackParamList, 'Timer'>;
 // screen
 export default function TimerScreen() {
     // hooks
-    const beepLongSound = useRef<Audio.Sound | null>(null);
-    const beepSound = useRef<Audio.Sound | null>(null);
     const route = useRoute<TimerScreenRouteProp>();
+    const scheme = useColorScheme();
     useKeepAwake();
+
+    // theme
+    const theme = useTheme(scheme);
+    const style = StyleSheet.create({
+        ...useStyles(theme),
+        middle: {
+            alignItems: 'center',
+            justifyContent: 'center',
+        },
+    })
 
     // attributes
     const [ blockIndex, setBlockIndex ]         = useState(0);
@@ -40,9 +50,11 @@ export default function TimerScreen() {
     const [ subBlockIndex, setSubBlockIndex ]   = useState(0);
     const [ timeLeft, setTimeLeft ]             = useState(0);
     const { workout }                           = route.params;
+    const beepLongSound                         = useRef<Audio.Sound | null>(null);
+    const beepSound                             = useRef<Audio.Sound | null>(null);
     const block                                 = workout.blocks?.[blockIndex] ?? null;
     const subBlock                              = block?.subBlocks?.[subBlockIndex] ?? null;
-    const timer                                 = useRef<NodeJS.Timeout>(null);
+    const timer                                 = useRef<NodeJS.Timeout | null>(null);
 
     // effects
     useEffect(() => {
@@ -198,11 +210,3 @@ export default function TimerScreen() {
         </View>
     );
 }
-
-const style = StyleSheet.create({
-    ...useStyles(theme),
-    middle: {
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-})

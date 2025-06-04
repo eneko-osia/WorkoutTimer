@@ -41,8 +41,12 @@ export class Workout {
         this._name = _name;
     }
 
-    get blocks(): readonly TimerBlock[] {
+    get blocks(): TimerBlock[] {
         return this._blocks;
+    }
+
+    set blocks(_blocks: TimerBlock[]) {
+        this._blocks = _blocks;
     }
 
     get totalDuration(): number {

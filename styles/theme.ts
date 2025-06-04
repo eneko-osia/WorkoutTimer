@@ -1,8 +1,8 @@
-import {
-    moderateScale,
-    scale,
-} from 'react-native-size-matters';
+// react imports
+import { ColorSchemeName } from 'react-native';
+import { moderateScale, scale } from 'react-native-size-matters';
 
+// themes
 const common = {
     borderRadius: {
         sm:     scale(2),
@@ -60,5 +60,7 @@ export const light = {
     },
 };
 
-export const theme = light
-export type Theme = typeof theme;
+export type Theme = typeof light;
+export const useTheme = (scheme: ColorSchemeName) => {
+    return (scheme === 'dark' ? dark : light);
+}

@@ -7,6 +7,7 @@ import {
     StyleSheet,
     Text,
     TouchableOpacity,
+    useColorScheme,
     View,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -18,8 +19,8 @@ import { deleteWorkout, loadWorkouts } from '../utils/storage';
 import { formatDuration } from '../utils/format';
 import { generateId } from '../utils/id';
 import { RootStackParamList } from '../navigation/types';
-import { theme } from '../styles/theme';
 import { useStyles } from '../styles/common';
+import { useTheme } from '../styles/theme';
 import { Workout } from '../types/workout';
 
 // type definitions
@@ -29,6 +30,11 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'H
 export default function HomeScreen() {
     // hooks
     const navigation = useNavigation<HomeScreenNavigationProp>();
+    const scheme = useColorScheme();
+
+    // theme
+    const theme = useTheme(scheme);
+    const style = StyleSheet.create({ ...useStyles(theme) })
 
     // attributes
     const [ workouts, setWorkouts ] = useState<Workout[]>([]);
@@ -126,8 +132,3 @@ export default function HomeScreen() {
         </View>
     );
 }
-
-// styles
-const style = StyleSheet.create({
-    ...useStyles(theme),
-})

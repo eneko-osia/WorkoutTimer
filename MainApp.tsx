@@ -2,13 +2,17 @@
 import React from 'react';
 import {
     StatusBar,
-    useColorScheme
+    StyleSheet,
+    useColorScheme,
 } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { NavigationContainer } from '@react-navigation/native';
 
 // project imports
 import { RootStackParamList } from './navigation/types';
+import { useStyles } from './styles/common';
+import { useTheme } from './styles/theme';
 import HomeScreen from  './screens/HomeScreen';
 import SetupScreen from './screens/SetupScreen';
 import TimerScreen from './screens/TimerScreen';
@@ -21,22 +25,28 @@ export default function MainApp() {
     // hooks
     const scheme = useColorScheme();
 
+    // theme
+    const theme = useTheme(scheme);
+    const style = StyleSheet.create({ ...useStyles(theme) })
+
     // jsx
     return (
         <>
             <StatusBar
-                barStyle = { scheme === 'dark' ? 'light-content' : 'dark-content' }
+                barStyle = { (scheme === 'dark' ? 'dark-content' : 'light-content') }
                 hidden = { false }
                 translucent = { false }
                 backgroundColor = 'transparent'
             />
-            <NavigationContainer>
-                <Stack.Navigator initialRouteName = 'Home'>
-                    <Stack.Screen name = 'Home' component = { HomeScreen } />
-                    <Stack.Screen name = 'Setup' component = { SetupScreen } />
-                    <Stack.Screen name = 'Timer' component = { TimerScreen } />
-                </Stack.Navigator>
-            </NavigationContainer>
+             <GestureHandlerRootView style = { style.flex1 } >
+                <NavigationContainer>
+                    <Stack.Navigator initialRouteName = 'Home'>
+                        <Stack.Screen name = 'Home' component = { HomeScreen } />
+                        <Stack.Screen name = 'Setup' component = { SetupScreen } />
+                        <Stack.Screen name = 'Timer' component = { TimerScreen } />
+                    </Stack.Navigator>
+                </NavigationContainer>
+            </GestureHandlerRootView>
         </>
     );
 }
