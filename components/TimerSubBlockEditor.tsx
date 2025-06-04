@@ -40,11 +40,6 @@ export default function TimerSubBlockEditor({ workout, block, subBlock, onChange
     const timer = useRef<NodeJS.Timeout>(null);
 
     // methods
-    const deleteSubBlock = (blockId: number, subBlockId: number) => {
-        workout.deleteSubBlock(blockId, subBlockId);
-        onChange();
-    };
-
     const decreaseDuration = (blockId: number, subBlock: TimerSubBlock, timeout: number = 250) => {
         subBlock.duration = Math.max(Workout.kMinDuration, subBlock.duration - 1)
         timer.current = setTimeout(() => { decreaseDuration(blockId, subBlock, Math.max(1, timeout - 10)) }, timeout);
@@ -64,7 +59,7 @@ export default function TimerSubBlockEditor({ workout, block, subBlock, onChange
 
     // jsx
     return (
-        <View style = { [ style.secondary, style.marginTop, style.padding, style.border, style.outline ] } key = { subBlock.id }>
+        <>
             <View style = { [ style.secondary, style.row ] }>
                 <TextInput style = { [ style.text, style.input, style.normal, style.left, style.marginRight, style.padding, style.flex1  ] }
                     value = { subBlock.label }
@@ -89,12 +84,6 @@ export default function TimerSubBlockEditor({ workout, block, subBlock, onChange
                     <MaterialIcons name = 'add' size = { theme.iconSize.sm }/>
                 </TouchableOpacity>
             </View>
-            <TouchableOpacity style = { [ style.quaternary, style.padding, style.button, (block.subBlocks.length <= 1 ?  style.disabled : {}), style.border, style.outline ] }
-                disabled = { block.subBlocks.length <= 1 }
-                onPress = { () => { deleteSubBlock(block.id, subBlock.id); } }
-            >
-                <MaterialIcons name = 'delete' size = { theme.iconSize.sm }/>
-            </TouchableOpacity>
-        </View>
+        </>
     );
 }

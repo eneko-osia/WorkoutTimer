@@ -13,9 +13,10 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
 
 // project imports
-import { deleteWorkout, loadWorkouts } from '../utils/storage';
+import { deleteWorkout, loadWorkouts, saveWorkouts } from '../utils/storage';
 import { formatDuration } from '../utils/format';
 import { generateId } from '../utils/id';
 import { RootStackParamList } from '../navigation/types';
@@ -75,26 +76,29 @@ export default function HomeScreen() {
         setWorkouts(await loadWorkouts(Workout.kStorageKey));
     };
 
+    const saveAsync = async (workouts: Workout[]) => {
+        await saveWorkouts(Workout.kStorageKey, workouts);
+    };
+
     // jsx
     return (
-        <View style = { [ style.primary, style.margin, style.padding, style.border, style.outline, style.flex1 ] }>
-            <View style = { [ style.secondary, style.marginTop, style.marginHorizontal, style.padding, style.border, style.outline ] }>
+        <View style = { [ style.primary, style.margin, style.padding, style.border, style.flex1 ] }>
+            <View style = { [ style.secondary, style.margin, style.padding, style.border, style.outlineThick ] }>
+                <Text style = { [ style.text, style.large, style.left ] } numberOfLines = { 1 }>
+                    Workouts
+                </Text>
                 <TouchableOpacity style = { [ style.quaternary, style.padding, style.button, style.border, style.outline ] }
                     onPress = { () => { navigation.navigate('Setup', { workout: createWorkout() }); } }
                 >
                     <MaterialIcons name = 'add' size = { theme.iconSize.sm }/>
                 </TouchableOpacity>
-            </View>
-            {workouts.length === 0 ? (
-                <></>
-            ) : (
-                <View style = { [ style.secondary, style.margin, style.padding, style.border, style.outline, style.flex1 ] }>
-                    <Text style = { [ style.text, style.large, style.left ] } numberOfLines = { 1 }>
-                        Workouts
-                    </Text>
-                    <ScrollView style = { [ style.secondary, style.paddingBottom ] }>
-                    {workouts.map((workout) => (
-                        <View style = { [ style.tertiary, style.marginTop, style.padding, style.border, style.outline ] } key = { workout.id }>
+                <DraggableFlatList
+                    data = { workouts }
+                    keyExtractor = { item => item.id.toString() }
+                    onDragEnd = { ({ data }) => { setWorkouts(data); saveAsync(data); } }
+                    scrollEnabled = { true }
+                    renderItem = {({ item: workout, drag, isActive }: RenderItemParams<Workout>) => (
+                        <View style = { [ style.tertiary, style.marginTop, style.padding, style.border, style.outlineThick ] } key = { workout.id }>
                             {/* <Text style = { [ style.text, style.normal ] }>
                                 { workout.id }
                             </Text> */}
@@ -123,12 +127,17 @@ export default function HomeScreen() {
                                 >
                                     <MaterialIcons name = 'delete' size = { theme.iconSize.sm }/>
                                 </TouchableOpacity>
+                                <TouchableOpacity style = { [ style.padding ] }
+                                    disabled = { isActive }
+                                    onPressOut = { drag }
+                                >
+                                    <MaterialIcons name = 'reorder' size = { theme.iconSize.sm }/>
+                                </TouchableOpacity>
                             </View>
                         </View>
-                    ))}
-                    </ScrollView>
-                </View>
-            )}
+                    )}
+                />
+            </View>
         </View>
     );
 }

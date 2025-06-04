@@ -26,6 +26,10 @@ export const useStyles = (theme: Theme) => {
             borderWidth: scale(1),
         },
 
+        outlineThick: {
+            borderWidth: scale(2),
+        },
+
         // buttons
         button: {
             alignItems: 'center',

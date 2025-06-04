@@ -21,7 +21,14 @@ export async function loadWorkouts(key: string): Promise<Workout[]> {
 
 export async function saveWorkout(key: string, workout: Workout): Promise<void> {
     const workouts = await loadWorkouts(key);
-    saveWorkouts(key, [...workouts.filter(w => w.id !== workout.id), workout])
+    const found = workouts.find((w) => w.id === workout.id);
+    if (found) {
+        Object.assign(found, workout);
+        saveWorkouts(key, workouts);
+    }
+    else {
+        saveWorkouts(key, [...workouts, workout])
+    }
 }
 
 export async function saveWorkouts(key: string, workouts: Workout[]): Promise<void> {
