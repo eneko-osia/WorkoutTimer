@@ -39,12 +39,12 @@ const common = {
 export const dark = {
     ...common,
     colors: {
-        primary:    '#181C14',
-        secondary:  '#3C3D37',
-        tertiary:   '#697565',
-        quaternary: '#ECDFCC',
-        border:     '#FFFFFF',
-        text:       '#181C14',
+        primary:    '#5A827E',
+        secondary:  '#84AE92',
+        tertiary:   '#B9D4AA',
+        quaternary: '#FAFFCA',
+        border:     '#E0E0E0',
+        text:       '#333333',
         input:      '#FFFFFF',
     },
 };

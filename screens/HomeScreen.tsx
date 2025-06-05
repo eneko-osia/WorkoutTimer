@@ -3,7 +3,6 @@ import React, { useCallback, useState } from 'react';
 import {
     Alert,
     Platform,
-    ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -82,8 +81,8 @@ export default function HomeScreen() {
 
     // jsx
     return (
-        <View style = { [ style.primary, style.margin, style.padding, style.border, style.flex1 ] }>
-            <View style = { [ style.secondary, style.margin, style.padding, style.border, style.outlineThick ] }>
+        <View style = { [ style.containerPrimary ] }>
+            <View style = { [ style.containerSecondary ] }>
                 <Text style = { [ style.text, style.large, style.left ] } numberOfLines = { 1 }>
                     Workouts
                 </Text>

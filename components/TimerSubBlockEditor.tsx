@@ -1,12 +1,12 @@
 // react imports
 import React, { useRef } from 'react';
 import {
-	StyleSheet,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	useColorScheme,
-	View,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    useColorScheme,
+    View,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 
@@ -60,23 +60,25 @@ export default function TimerSubBlockEditor({ workout, block, subBlock, onChange
     // jsx
     return (
         <>
-            <View style = { [ style.secondary, style.row ] }>
-                <TextInput style = { [ style.text, style.input, style.normal, style.left, style.marginRight, style.padding, style.flex1  ] }
+            <View style = { [ style.secondary ] }>
+                <TextInput style = { [ style.text, style.input, style.normal, style.left, style.padding, style.border, style.outline ] }
                     value = { subBlock.label }
                     maxLength = { 64 }
                     onChangeText = {(text) => { subBlock.label = text; onChange(); } }
                 />
-                <TouchableOpacity style = { [ style.quaternary, style.marginVertical, style.padding, style.button, (subBlock.duration <= Workout.kMinDuration ?  style.disabled : {}), style.border, style.outline ] }
+            </View>
+            <View style = { [ style.secondary, style.row, style.marginTop ] }>
+                <TouchableOpacity style = { [ style.quaternary, style.button, (subBlock.duration <= Workout.kMinDuration ?  style.disabled : {}), style.padding, style.border, style.outline ] }
                     disabled = { subBlock.duration <= Workout.kMinDuration }
                     onPressIn = { () => { decreaseDuration(block.id, subBlock); } }
                     onPressOut = { () => { stopTimer(); } }
                 >
                     <MaterialIcons name = 'remove' size = { theme.iconSize.sm }/>
                 </TouchableOpacity>
-                <Text style = { [ style.text, style.normal, style.center, style.fixWidth ] }>
+                <Text style = { [ style.text, style.center, style.normal, style.bold, style.fixWidth, style.marginHorizontal ] }>
                     { formatDuration(subBlock.duration) }
                 </Text>
-                <TouchableOpacity style = { [ style.quaternary, style.marginVertical, style.padding, style.button, (subBlock.duration >= Workout.kMaxDuration ?  style.disabled : {}), style.border, style.outline ] }
+                <TouchableOpacity style = { [ style.quaternary, style.button, (subBlock.duration >= Workout.kMaxDuration ?  style.disabled : {}), style.padding, style.border, style.outline ] }
                     disabled = { subBlock.duration >= Workout.kMaxDuration }
                     onPressIn = { () => { increaseDuration(block.id, subBlock); } }
                     onPressOut = { () => { stopTimer(); } }

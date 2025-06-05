@@ -89,8 +89,8 @@ export default function SetupScreen() {
 
     // jsx
     return (
-        <View style = { [ style.primary, style.margin, style.padding, style.border, style.flex1 ] }>
-            <View style = { [ style.secondary, style.marginVertical, style.marginHorizontal, style.padding, style.border, style.outlineThick ] }>
+        <View style = { [ style.containerPrimary ] }>
+            <View style = { [ style.containerSecondary ] }>
                 <View style = { [ style.secondary, style.row ] }>
                     <TextInput style = { [ style.text, style.input, style.normal, style.left, style.padding, style.flex1  ] }
                         value = { workout.name }
@@ -118,7 +118,7 @@ export default function SetupScreen() {
             {workout.blocks.length === 0 ? (
                 <></>
             ) : (
-                <View style = { [ style.secondary, style.margin, style.padding, style.border, style.outlineThick ] }>
+                <View style = { [ style.secondary, style.margin, style.padding, style.border, style.outlineThick, style.flex1 ] }>
                     <DraggableFlatList
                         data = { workout.blocks }
                         keyExtractor = { item => item.id.toString() }

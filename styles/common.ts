@@ -54,6 +54,22 @@ export const useStyles = (theme: Theme) => {
         },
 
         // containers
+        containerPrimary: {
+            backgroundColor: theme.colors.primary,
+            borderColor: theme.colors.border,
+            borderRadius: theme.borderRadius.md,
+            flex: 1,
+            margin: theme.spacing.xs,
+            padding: theme.spacing.xs,
+        },
+        containerSecondary: {
+            backgroundColor: theme.colors.secondary,
+            borderColor: theme.colors.border,
+            borderRadius: theme.borderRadius.md,
+            borderWidth: scale(2),
+            margin: theme.spacing.xs,
+            padding: theme.spacing.xs,
+        },
         row: {
             alignItems: 'center',
             flexDirection: 'row',
@@ -72,6 +88,14 @@ export const useStyles = (theme: Theme) => {
         },
         flex4: {
             flex: 4,
+        },
+
+        // line
+        line: {
+            alignSelf: 'stretch',
+            backgroundColor: theme.colors.primary,
+            height: '100%',
+            width: scale(1),
         },
 
         // spacing
@@ -122,36 +146,32 @@ export const useStyles = (theme: Theme) => {
         text: {
             color: theme.colors.text,
         },
-        input: { 
+        input: {
             backgroundColor: theme.colors.input,
+        },
+        bold: {
+            fontWeight: 'bold',
         },
         normal: {
             fontSize: theme.fontSizes.md,
-            fontWeight: 'bold',
         },
         xxsmall: {
             fontSize: theme.fontSizes.xxs,
-            fontWeight: 'bold',
         },
         xsmall: {
             fontSize: theme.fontSizes.xs,
-            fontWeight: 'bold',
         },
         small: {
             fontSize: theme.fontSizes.sm,
-            fontWeight: 'bold',
         },
         large: {
             fontSize: theme.fontSizes.lg,
-            fontWeight: 'bold',
         },
         xlarge: {
             fontSize: theme.fontSizes.xl,
-            fontWeight: 'bold',
         },
         xxlarge: {
             fontSize: theme.fontSizes.xxl,
-            fontWeight: 'bold',
         },
     });
 }

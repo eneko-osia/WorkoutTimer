@@ -122,21 +122,24 @@ export default function TimerBlockEditor({ workout, block, onChange }: Props) {
                 onDragEnd = { ({ data }) => { block.subBlocks = data; onChange(); } }
                 scrollEnabled = { false }
                 renderItem = {({ item: subBlock, drag, isActive }: RenderItemParams<TimerSubBlock>) => (
-                    <View style = { [ style.secondary, style.marginTop, style.padding, style.border, style.outline ] } key = { subBlock.id }>
-                        <TimerSubBlockEditor
-                            workout = { workout }
-                            block = { block }
-                            subBlock = { subBlock }
-                            onChange = { onChange }
-                        />
-                        <View style = { [ style.secondary, style.marginTop, style.row ] }>
-                            <TouchableOpacity style = { [ style.quaternary, style.padding, style.button, (block.subBlocks.length <= 1 ?  style.disabled : {}), style.border, style.outline, style.flex1 ] }
+                    <View style = { [ style.secondary, style.row, style.marginVertical, style.padding, style.border, style.outline ] } key = { subBlock.id }>
+                        <View style = { [ style.secondary, style.flex1 ] }>
+                            <TimerSubBlockEditor
+                                workout = { workout }
+                                block = { block }
+                                subBlock = { subBlock }
+                                onChange = { onChange }
+                            />
+                        </View>
+                        <View style = { [ style.line, style.marginHorizontal ] } />
+                        <View style = { [ style.secondary ] }>
+                            <TouchableOpacity style = { [ style.quaternary, style.padding, style.button, (block.subBlocks.length <= 1 ?  style.disabled : {}), style.border, style.outline ] }
                                 disabled = { block.subBlocks.length <= 1 }
                                 onPress = { () => { removeSubBlock(block.id, subBlock); } }
                             >
                                 <MaterialIcons name = 'delete' size = { theme.iconSize.sm }/>
                             </TouchableOpacity>
-                            <TouchableOpacity style = { [ style.padding ] }
+                            <TouchableOpacity style = { [ style. marginTop, style.padding ] }
                                 disabled = { isActive }
                                 onPressOut = { drag }
                             >
