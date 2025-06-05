@@ -171,36 +171,38 @@ export default function TimerScreen() {
 
     // jsx
     return (
-        <View style = { [ style.primary, style.margin, style.padding, style.border, style.outline, style.flex1 ] }>
-            <View style = { [ style.secondary, style.marginTop, style.marginHorizontal, style.padding, style.row, style.border, style.outline ] }>
-                <Text style = { [ style.text, style.normal, style.left, style.flex1 ] } numberOfLines = { 1 }>
-                    { workout.name }
-                </Text>
-                <Text style = { [ style.text, style.normal, style.right ] } numberOfLines = { 1 }>
-                    { formatDuration(elapsedTime) + ' / ' + formatDuration(workout.totalDuration) }
-                </Text>
+        <View style = { [ style.containerPrimary ] }>
+            <View style = { [ style.containerSecondary ] }>
+                <View style = { [ style.secondary, style.row ] }>
+                    <Text style = { [ style.text, style.normal, style.bold, style.left, style.flex1 ] } numberOfLines = { 1 }>
+                        { workout.name }
+                    </Text>
+                    <Text style = { [ style.text, style.normal, style.bold, style.right ] } numberOfLines = { 1 }>
+                        { formatDuration(elapsedTime) + ' / ' + formatDuration(workout.totalDuration) }
+                    </Text>
+                </View>
             </View>
             {!isRunning ? (
-                <View style = { [ style.secondary, style.margin, style.padding, style.border, style.outline, style.flex1 ] }>
-                    <View style = { [ style.tertiary, style.padding, style.middle, style.border, style.outline, style.flex1 ] }>
-                        <Text style = { [ style.text, style.xlarge, style.center] }>
-                            Workout Completed!
+                <View style = { [ style.secondary, style.margin, style.padding, style.border, style.outlineThick, style.flex1 ] }>
+                    <View style = { [ style.tertiary, style.padding, style.middle, style.border, style.outlineThick, style.flex1 ] }>
+                        <Text style = { [ style.text, style.xlarge, style.bold, style.center] }>
+                            Workout{'\n'}Completed
                         </Text>
                     </View>
                 </View>
             ) : (
-                <View style = { [ style.secondary, style.margin, style.padding, style.border, style.outline, style.flex1 ] }>
-                    <View style = { [ style.tertiary, style.padding, style.border, style.outline ] }>
+                <View style = { [ style.secondary, style.margin, style.padding, style.border, style.outlineThick, style.flex1 ] }>
+                    <View style = { [ style.tertiary, style.padding, style.border, style.outlineThick ] }>
                         <Text style = { [ style.text, style.large, style.center ] } numberOfLines = { 1 }>
                             Set {setsIndex + 1} / {block.sets}
                         </Text>
                     </View>
-                    <View style = { [ style.tertiary, style.marginTop, style.padding, style.middle, style.border, style.outline, style.flex1 ] }>
-                        <Text style = { [ style.text, style.xlarge, style.center ] } numberOfLines = { 1 }>
+                    <View style = { [ style.tertiary, style.marginTop, style.padding, style.middle, style.border, style.outlineThick, style.flex1 ] }>
+                        <Text style = { [ style.text, style.xlarge, style.bold, style.center ] } numberOfLines = { 1 }>
                             { formatDuration(timeLeft) }
                         </Text>
                     </View>
-                    <View style = { [ style.tertiary, style.marginTop, style.padding, style.border, style.outline ] }>
+                    <View style = { [ style.tertiary, style.marginTop, style.padding, style.border, style.outlineThick ] }>
                         <Text style = { [ style.text, style.large, style.center ] } numberOfLines = { 1 }>
                             { subBlock.label }
                         </Text>

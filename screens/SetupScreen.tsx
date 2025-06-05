@@ -125,7 +125,7 @@ export default function SetupScreen() {
                         data = { workout.blocks }
                         ref = { flatList }
                         keyExtractor = { (item) => item.id.toString() }
-                        renderItem={({ item }) => (
+                        renderItem = {({ item }) => (
                             <View style = { [ style.tertiary, style.marginVertical, style.padding, style.border, style.outlineThick, style.flex1 ] } key = { item.id }>
                                 <TimerBlockEditor
                                     workout = { workout }
