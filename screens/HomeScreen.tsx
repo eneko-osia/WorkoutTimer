@@ -83,7 +83,7 @@ export default function HomeScreen() {
     return (
         <View style = { [ style.containerPrimary ] }>
             <View style = { [ style.containerSecondary ] }>
-                <Text style = { [ style.text, style.large, style.left ] } numberOfLines = { 1 }>
+                <Text style = { [ style.text, style.large, style.bold, style.left ] } numberOfLines = { 1 }>
                     Workouts
                 </Text>
                 <TouchableOpacity style = { [ style.quaternary, style.padding, style.button, style.border, style.outline ] }
@@ -98,14 +98,14 @@ export default function HomeScreen() {
                     scrollEnabled = { true }
                     renderItem = {({ item: workout, drag, isActive }: RenderItemParams<Workout>) => (
                         <View style = { [ style.tertiary, style.marginTop, style.padding, style.border, style.outlineThick ] } key = { workout.id }>
-                            {/* <Text style = { [ style.text, style.normal ] }>
+                            {/* <Text style = { [ style.text, style.normal, style.bold ] }>
                                 { workout.id }
                             </Text> */}
                             <View style = { [ style.tertiary, style.marginHorizontal, style.row ] }>
-                                <Text style = { [ style.text, style.normal, style.left, style.flex1 ] } numberOfLines = { 1 }>
+                                <Text style = { [ style.text, style.normal, style.bold, style.left, style.flex1 ] } numberOfLines = { 1 }>
                                     { workout.name }
                                 </Text>
-                                <Text style = { [ style.text, style.normal, style.right ] } numberOfLines = { 1 }>
+                                <Text style = { [ style.text, style.normal, style.bold, style.right ] } numberOfLines = { 1 }>
                                     { formatDuration(workout.totalDuration) }
                                 </Text>
                             </View>

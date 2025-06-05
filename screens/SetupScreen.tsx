@@ -1,7 +1,8 @@
 // react imports
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
     Alert,
+    FlatList,
     Platform,
     StyleSheet,
     TextInput,
@@ -12,14 +13,13 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
 
 // project imports
 import { RootStackParamList } from '../navigation/types';
 import { saveWorkout } from '../utils/storage';
-import { TimerBlock, Workout } from '../types/workout';
 import { useStyles } from '../styles/common';
 import { useTheme } from '../styles/theme';
+import { Workout } from '../types/workout';
 import TimerBlockEditor from '../components/TimerBlockEditor';
 
 // type definitions
@@ -40,15 +40,16 @@ export default function SetupScreen() {
     // attributes
     const [ , forceUpdate ] = useState(false);
     const { workout }       = route.params;
+    const flatList          = useRef<FlatList>(null);
 
     // methods
     const createBlock = () => {
-        createSubBlock(
-            workout.addBlock({
-                sets: 1,
-                subBlocks: []
-            })
-        );
+        const blockId: number = workout.addBlock({
+            sets: 1,
+            subBlocks: []
+        });
+        createSubBlock(blockId);
+        flatList.current?.scrollToEnd({ animated: true });
     };
 
     const createSubBlock = (blockId: number) => {
@@ -62,6 +63,7 @@ export default function SetupScreen() {
     const deleteBlock = (blockId: number) => {
         workout.deleteBlock(blockId)
         update();
+        flatList.current?.scrollToOffset({ offset: 0, animated: true });
     };
 
     const removeBlock = (blockId: number) => {
@@ -119,30 +121,23 @@ export default function SetupScreen() {
                 <></>
             ) : (
                 <View style = { [ style.secondary, style.margin, style.padding, style.border, style.outlineThick, style.flex1 ] }>
-                    <DraggableFlatList
+                    <FlatList
                         data = { workout.blocks }
-                        keyExtractor = { item => item.id.toString() }
-                        onDragEnd = { ({ data }) => { workout.blocks = data; update(); } }
-                        scrollEnabled = { true }
-                        renderItem = {({ item: block, drag, isActive }: RenderItemParams<TimerBlock>) => (
-                            <View style = { [ style.tertiary, style.marginVertical, style.padding, style.border, style.outlineThick, style.flex1 ] } key = { block.id }>
+                        ref = { flatList }
+                        keyExtractor = { (item) => item.id.toString() }
+                        renderItem={({ item }) => (
+                            <View style = { [ style.tertiary, style.marginVertical, style.padding, style.border, style.outlineThick, style.flex1 ] } key = { item.id }>
                                 <TimerBlockEditor
                                     workout = { workout }
-                                    block = { block }
+                                    block = { item }
                                     onChange = { update }
                                 />
                                 <View style = { [ style.tertiary, style.marginTop, style.row ] }>
                                     <TouchableOpacity style = { [ style.quaternary, style.marginTop, style.padding, style.button, (workout.blocks.length <= 1 ?  style.disabled : {}), style.border, style.outline, style.flex1 ] }
                                         disabled = { workout.blocks.length <= 1 }
-                                        onPress = { () => { removeBlock(block.id); } }
+                                        onPress = { () => { removeBlock(item.id); } }
                                     >
                                         <MaterialIcons name = 'delete' size = { theme.iconSize.sm }/>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style = { [ style.marginTop, style.padding ] }
-                                        disabled = { isActive }
-                                        onPressOut = { drag }
-                                    >
-                                        <MaterialIcons name = 'reorder' size = { theme.iconSize.sm }/>
                                     </TouchableOpacity>
                                 </View>
                             </View>

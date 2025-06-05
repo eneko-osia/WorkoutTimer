@@ -10,7 +10,6 @@ import {
     View,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
 
 // project imports
 import { TimerBlock, TimerSubBlock, Workout } from '../types/workout';
@@ -90,7 +89,7 @@ export default function TimerBlockEditor({ workout, block, onChange }: Props) {
     return (
         <>
             <View style = { [ style.tertiary, style.marginHorizontal, style.row ] }>
-                <Text style = { [ style.text, style.normal, style.left, style.marginRight, style.flex1 ] } numberOfLines = { 1 }>
+                <Text style = { [ style.text, style.normal, style.bold, style.left, style.marginRight, style.flex1 ] } numberOfLines = { 1 }>
                     Sets
                 </Text>
                 <TouchableOpacity style = { [ style.quaternary, style.marginVertical, style.padding, style.button, (block.sets <= Workout.kMinSets ?  style.disabled : {}), style.border, style.outline ] }
@@ -100,7 +99,7 @@ export default function TimerBlockEditor({ workout, block, onChange }: Props) {
                 >
                     <MaterialIcons name = 'remove' size = { theme.iconSize.sm }/>
                 </TouchableOpacity>
-                <Text style = { [ style.text, style.normal, style.center, style.fixWidth ] }>
+                <Text style = { [ style.text, style.normal, style.bold, style.center, style.fixWidth ] }>
                     { block.sets }
                 </Text>
                 <TouchableOpacity style = { [ style.quaternary, style.marginVertical, style.padding, style.button, (block.sets >= Workout.kMaxSets ?  style.disabled : {}), style.border, style.outline ] }
@@ -116,39 +115,27 @@ export default function TimerBlockEditor({ workout, block, onChange }: Props) {
             >
                 <MaterialIcons name = 'add' size = { theme.iconSize.sm }/>
             </TouchableOpacity>
-            <DraggableFlatList
-                data = { block.subBlocks }
-                keyExtractor = { item => item.id.toString() }
-                onDragEnd = { ({ data }) => { block.subBlocks = data; onChange(); } }
-                scrollEnabled = { false }
-                renderItem = {({ item: subBlock, drag, isActive }: RenderItemParams<TimerSubBlock>) => (
-                    <View style = { [ style.secondary, style.row, style.marginVertical, style.padding, style.border, style.outline ] } key = { subBlock.id }>
-                        <View style = { [ style.secondary, style.flex1 ] }>
-                            <TimerSubBlockEditor
-                                workout = { workout }
-                                block = { block }
-                                subBlock = { subBlock }
-                                onChange = { onChange }
-                            />
-                        </View>
-                        <View style = { [ style.line, style.marginHorizontal ] } />
-                        <View style = { [ style.secondary ] }>
-                            <TouchableOpacity style = { [ style.quaternary, style.padding, style.button, (block.subBlocks.length <= 1 ?  style.disabled : {}), style.border, style.outline ] }
-                                disabled = { block.subBlocks.length <= 1 }
-                                onPress = { () => { removeSubBlock(block.id, subBlock); } }
-                            >
-                                <MaterialIcons name = 'delete' size = { theme.iconSize.sm }/>
-                            </TouchableOpacity>
-                            <TouchableOpacity style = { [ style. marginTop, style.padding ] }
-                                disabled = { isActive }
-                                onPressOut = { drag }
-                            >
-                                <MaterialIcons name = 'reorder' size = { theme.iconSize.sm }/>
-                            </TouchableOpacity>
-                        </View>
+            {block.subBlocks.map((subBlock) => (
+                <View style = { [ style.secondary, style.row, style.marginVertical, style.padding, style.border, style.outline ] } key = { subBlock.id }>
+                    <View style = { [ style.secondary, style.flex1 ] }>
+                        <TimerSubBlockEditor
+                            workout = { workout }
+                            block = { block }
+                            subBlock = { subBlock }
+                            onChange = { onChange }
+                        />
                     </View>
-                )}
-            />
+                    <View style = { [ style.line, style.marginHorizontal ] } />
+                    <View style = { [ style.secondary ] }>
+                        <TouchableOpacity style = { [ style.quaternary, style.padding, style.button, (block.subBlocks.length <= 1 ?  style.disabled : {}), style.border, style.outline ] }
+                            disabled = { block.subBlocks.length <= 1 }
+                            onPress = { () => { removeSubBlock(block.id, subBlock); } }
+                        >
+                            <MaterialIcons name = 'delete' size = { theme.iconSize.sm }/>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            ))}
         </>
     );
 }
