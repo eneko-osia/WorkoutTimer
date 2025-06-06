@@ -53,6 +53,13 @@ export default function TimerBlockEditor({ workout, block, onChange }: Props) {
         onChange();
     };
 
+    const moveSubBlock = (fromIndex: number, toIndex: number) => {
+        if (fromIndex === toIndex) { return; }
+        const [ item ] = block.subBlocks.splice(fromIndex, 1);
+        block.subBlocks.splice(toIndex, 0, item);
+        onChange();
+    }
+
     const removeSubBlock = (blockId: number, subBlock: TimerSubBlock) => {
         if (Platform.OS === 'web') {
             deleteSubBlock(blockId, subBlock.id);
@@ -115,7 +122,7 @@ export default function TimerBlockEditor({ workout, block, onChange }: Props) {
             >
                 <MaterialIcons name = 'add' size = { theme.iconSize.sm }/>
             </TouchableOpacity>
-            {block.subBlocks.map((subBlock) => (
+            {block.subBlocks.map((subBlock, index, array) => (
                 <View style = { [ style.secondary, style.row, style.marginVertical, style.padding, style.border, style.outline ] } key = { subBlock.id }>
                     <View style = { [ style.secondary, style.flex1 ] }>
                         <TimerSubBlockEditor
@@ -127,11 +134,23 @@ export default function TimerBlockEditor({ workout, block, onChange }: Props) {
                     </View>
                     <View style = { [ style.line, style.marginHorizontal ] } />
                     <View style = { [ style.secondary ] }>
-                        <TouchableOpacity style = { [ style.quaternary, style.padding, style.button, (block.subBlocks.length <= 1 ?  style.disabled : {}), style.border, style.outline ] }
-                            disabled = { block.subBlocks.length <= 1 }
+                        <TouchableOpacity style = { [ style.quaternary, style.paddingHorizontal, style.button, (index == 0 ?  style.disabled : {}), style.border, style.outline ] }
+                            disabled = { index == 0 }
+                            onPress = { () => { moveSubBlock(index, Math.max(0, index - 1)); } }
+                        >
+                            <MaterialIcons name = 'arrow-upward' size = { theme.iconSize.sm }/>
+                        </TouchableOpacity>
+                        <TouchableOpacity style = { [ style.quaternary, style.marginTop, style.padding, style.button, (array.length <= 1 ?  style.disabled : {}), style.border, style.outline ] }
+                            disabled = { array.length <= 1 }
                             onPress = { () => { removeSubBlock(block.id, subBlock); } }
                         >
                             <MaterialIcons name = 'delete' size = { theme.iconSize.sm }/>
+                        </TouchableOpacity>
+                        <TouchableOpacity style = { [ style.quaternary, style.marginTop, style.paddingHorizontal, (index == (array.length - 1) ?  style.disabled : {}), style.button, style.border, style.outline ] }
+                            disabled = { index == (array.length - 1) }
+                            onPress = { () => { moveSubBlock(index, Math.min((array.length - 1), index + 1)); } }
+                        >
+                            <MaterialIcons name = 'arrow-downward' size = { theme.iconSize.sm }/>
                         </TouchableOpacity>
                     </View>
                 </View>
