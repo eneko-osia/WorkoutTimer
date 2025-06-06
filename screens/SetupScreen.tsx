@@ -13,6 +13,7 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import Animated, { LinearTransition } from 'react-native-reanimated';
 
 // project imports
 import { RootStackParamList } from '../navigation/types';
@@ -63,7 +64,6 @@ export default function SetupScreen() {
     const deleteBlock = (blockId: number) => {
         workout.deleteBlock(blockId)
         update();
-        flatList.current?.scrollToOffset({ offset: 0, animated: true });
     };
 
     const moveBlock = (fromIndex: number, toIndex: number) => {
@@ -71,7 +71,6 @@ export default function SetupScreen() {
         const [ item ] = workout.blocks.splice(fromIndex, 1);
         workout.blocks.splice(toIndex, 0, item);
         update();
-        flatList.current?.scrollToIndex({ index: toIndex, animated: true });
     }
 
     const removeBlock = (blockId: number) => {
@@ -129,10 +128,11 @@ export default function SetupScreen() {
                 <></>
             ) : (
                 <View style = { [ style.secondary, style.margin, style.padding, style.border, style.outlineThick, style.flex1 ] }>
-                    <FlatList
+                    <Animated.FlatList
                         data = { workout.blocks }
                         ref = { flatList }
                         keyExtractor = { (item) => item.id.toString() }
+                        itemLayoutAnimation = { LinearTransition }
                         renderItem = {({ item, index }) => (
                             <View style = { [ style.tertiary, style.marginVertical, style.padding, style.border, style.outlineThick, style.flex1 ] } key = { item.id }>
                                 <TimerBlockEditor
