@@ -1,5 +1,6 @@
 // react imports
 import { ColorSchemeName } from 'react-native';
+import { DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { moderateScale, scale } from 'react-native-size-matters';
 
 // themes
@@ -38,27 +39,27 @@ const common = {
 
 export const dark = {
     ...common,
+    ...DarkTheme,
     colors: {
-        primary:    '#5A827E',
-        secondary:  '#84AE92',
-        tertiary:   '#B9D4AA',
-        quaternary: '#FAFFCA',
-        border:     '#E0E0E0',
-        text:       '#333333',
-        input:      '#FFFFFF',
+        ...DarkTheme.colors,
+        primary:    'rgb(90, 130, 126)',
+        secondary:  'rgb(132, 174, 146)',
+        tertiary:   'rgb(185, 212, 170)',
+        quaternary: 'rgb(250, 255, 202)',
+        input:      'rgb(18, 18, 18)',
     },
 };
 
 export const light = {
     ...common,
+    ...DefaultTheme,
     colors: {
-        primary:    '#5A827E',
-        secondary:  '#84AE92',
-        tertiary:   '#B9D4AA',
-        quaternary: '#FAFFCA',
-        border:     '#E0E0E0',
-        text:       '#333333',
-        input:      '#FFFFFF',
+        ...DefaultTheme.colors,
+        primary:    'rgb(90, 130, 126)',
+        secondary:  'rgb(132, 174, 146)',
+        tertiary:   'rgb(185, 212, 170)',
+        quaternary: 'rgb(250, 255, 202)',
+        input:      'rgb(255, 255, 255)',
     },
 };
 

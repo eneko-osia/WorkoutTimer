@@ -39,7 +39,7 @@ export default function MainApp() {
                 backgroundColor = 'transparent'
             />
              <GestureHandlerRootView style = { style.flex1 } >
-                <NavigationContainer>
+                <NavigationContainer theme = { theme } >
                     <Stack.Navigator initialRouteName = 'Home'>
                         <Stack.Screen name = 'Home' component = { HomeScreen } />
                         <Stack.Screen name = 'Setup' component = { SetupScreen } />
