@@ -105,19 +105,19 @@ export default function SetupScreen() {
                         disabled = { workout.blocks.length === 0 }
                         onPress = { () => { navigation.navigate('Timer', { workout }); }}
                     >
-                        <MaterialIcons name = 'play-arrow' size = { theme.iconSize.sm }/>
+                        <MaterialIcons name = 'play-arrow' size = { theme.sizes.sm }/>
                     </TouchableOpacity>
                     <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.padding, style.button, (!pendingChanges ?  style.disabled : {}), style.border, style.outline ] }
                         disabled = { !pendingChanges }
                         onPress = { () => { saveAsync(); }}
                     >
-                        <MaterialIcons name = 'save' size = { theme.iconSize.sm }/>
+                        <MaterialIcons name = 'save' size = { theme.sizes.sm }/>
                     </TouchableOpacity>
                 </View>
                 <TouchableOpacity style = { [ style.quaternary, style.marginTop, style.padding, style.button, style.border, style.outline ] }
                     onPress = { () => createBlock() }
                 >
-                    <MaterialIcons name = 'add' size = { theme.iconSize.sm }/>
+                    <MaterialIcons name = 'add' size = { theme.sizes.sm }/>
                 </TouchableOpacity>
             </View>
             {workout.blocks.length === 0 ? (
@@ -141,19 +141,19 @@ export default function SetupScreen() {
                                         disabled = { index == 0 }
                                         onPress = { () => { moveBlock(index, Math.max(0, index - 1)); } }
                                     >
-                                        <MaterialIcons name = 'arrow-upward' size = { theme.iconSize.sm }/>
+                                        <MaterialIcons name = 'arrow-upward' size = { theme.sizes.sm }/>
                                     </TouchableOpacity>
                                     <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.marginTop, style.padding, style.button, (workout.blocks.length <= 1 ?  style.disabled : {}), style.border, style.outline, style.flex1 ] }
                                         disabled = { workout.blocks.length <= 1 }
                                         onPress = { () => { removeBlock(item.id); } }
                                     >
-                                        <MaterialIcons name = 'delete' size = { theme.iconSize.sm }/>
+                                        <MaterialIcons name = 'delete' size = { theme.sizes.sm }/>
                                     </TouchableOpacity>
                                     <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.marginTop, style.padding, (index == (workout.blocks.length - 1) ?  style.disabled : {}), style.button, style.border, style.outline ] }
                                         disabled = { index == (workout.blocks.length - 1) }
                                         onPress = { () => { moveBlock(index, Math.min((workout.blocks.length - 1), index + 1)); } }
                                     >
-                                        <MaterialIcons name = 'arrow-downward' size = { theme.iconSize.sm }/>
+                                        <MaterialIcons name = 'arrow-downward' size = { theme.sizes.sm }/>
                                     </TouchableOpacity>
                                 </View>
                             </View>

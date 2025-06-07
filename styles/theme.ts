@@ -19,7 +19,7 @@ const common = {
         xl:     moderateScale(64),
         xxl:    moderateScale(128),
     },
-    iconSize: {
+    sizes: {
         xs:     scale(8),
         sm:     scale(16),
         md:     scale(32),

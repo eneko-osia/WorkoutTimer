@@ -70,6 +70,22 @@ export const useStyles = (theme: Theme) => {
             margin: theme.spacing.xs,
             padding: theme.spacing.xs,
         },
+        containerModal: {
+            backgroundColor: 'rgba(10, 10, 10, 0.5)',
+            borderColor: theme.colors.border,
+            borderRadius: theme.borderRadius.md,
+            // flex: 1,
+            // justifyContent: 'center',
+            margin: theme.spacing.xs,
+            padding: theme.spacing.xs,
+        },
+        modal: {
+            backgroundColor: theme.colors.secondary,
+            borderColor: theme.colors.border,
+            borderRadius: theme.borderRadius.md,
+            elevation: scale(5),
+            padding: theme.spacing.xs,
+        },
         row: {
             alignItems: 'center',
             flexDirection: 'row',

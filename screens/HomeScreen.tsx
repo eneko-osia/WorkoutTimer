@@ -103,7 +103,7 @@ export default function HomeScreen() {
                 <TouchableOpacity style = { [ style.quaternary, style.padding, style.button, style.border, style.outline ] }
                     onPress = { () => { navigation.navigate('Setup', { workout: createWorkout(), pendingSave: true }); } }
                 >
-                    <MaterialIcons name = 'add' size = { theme.iconSize.sm }/>
+                    <MaterialIcons name = 'add' size = { theme.sizes.sm }/>
                 </TouchableOpacity>
                 <DraggableFlatList
                     data = { workouts }
@@ -128,23 +128,23 @@ export default function HomeScreen() {
                                     disabled = { workout.blocks.length === 0 }
                                     onPress = { () => { navigation.navigate('Timer', { workout }); }}
                                 >
-                                    <MaterialIcons name = 'play-arrow' size = { theme.iconSize.sm }/>
+                                    <MaterialIcons name = 'play-arrow' size = { theme.sizes.sm }/>
                                 </TouchableOpacity>
                                 <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.padding, style.button, style.border, style.outline ] }
                                     onPress = { () => { navigation.navigate('Setup', { workout: workout, pendingSave: false }); }}
                                 >
-                                    <MaterialIcons name = 'edit' size = { theme.iconSize.sm }/>
+                                    <MaterialIcons name = 'edit' size = { theme.sizes.sm }/>
                                 </TouchableOpacity>
                                 <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.padding, style.button, style.border, style.outline ] }
                                     onPress = { () => { removeWorkout(workout); } }
                                 >
-                                    <MaterialIcons name = 'delete' size = { theme.iconSize.sm }/>
+                                    <MaterialIcons name = 'delete' size = { theme.sizes.sm }/>
                                 </TouchableOpacity>
                                 <TouchableOpacity style = { [ style.padding ] }
                                     disabled = { isActive }
                                     onPressOut = { drag }
                                 >
-                                    <MaterialIcons name = 'reorder' size = { theme.iconSize.sm }/>
+                                    <MaterialIcons name = 'reorder' size = { theme.sizes.sm }/>
                                 </TouchableOpacity>
                             </View>
                         </View>

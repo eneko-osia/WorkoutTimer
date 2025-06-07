@@ -1,9 +1,11 @@
 import { generateId } from '../utils/id';
+import { generateRandomColor } from '../utils/color';
 
 export type TimerSubBlock = {
     id: number;
     label: string;
     duration: number;
+    color: string;
 };
 
 export type TimerBlock = {
@@ -81,7 +83,8 @@ export class Workout {
     createSubBlock(blockId: number, label: string, duration: number = 10): number {
         return this.addSubBlock(blockId, {
             label: label,
-            duration: duration
+            duration: duration,
+            color: generateRandomColor()
         });
     };
 

@@ -1,5 +1,5 @@
 // react imports
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import {
     StyleSheet,
     Text,
@@ -15,6 +15,7 @@ import { formatDuration } from '../utils/format';
 import { TimerBlock, TimerSubBlock, Workout } from '../types/workout';
 import { useStyles } from '../styles/common';
 import { useTheme } from '../styles/theme';
+import ColorPickerModal from '../components/ColorPickerModal';
 
 // type definitions
 type Props = {
@@ -37,7 +38,8 @@ export default function TimerSubBlockEditor({ workout, block, subBlock, onChange
     })
 
     // attributes
-    const timer = useRef<NodeJS.Timeout>(null);
+    const [showColorPicker, setShowColorPicker] = useState(false);
+    const timer                                 = useRef<NodeJS.Timeout>(null);
 
     // methods
     const decreaseDuration = (blockId: number, subBlock: TimerSubBlock, timeout: number = 250) => {
@@ -60,20 +62,20 @@ export default function TimerSubBlockEditor({ workout, block, subBlock, onChange
     // jsx
     return (
         <>
-            <View style = { [ style.secondary ] }>
+            <View style = { [ style.secondary, style.border ] }>
                 <TextInput style = { [ style.text, style.input, style.normal, style.left, style.padding, style.border, style.outline ] }
                     value = { subBlock.label }
                     maxLength = { 64 }
                     onChangeText = {(text) => { subBlock.label = text; onChange(); } }
                 />
             </View>
-            <View style = { [ style.secondary, style.row, style.marginTop ] }>
+            <View style = { [ {backgroundColor: subBlock.color }, style.row, style.marginTop, style.paddingVertical, style.border ] }>
                 <TouchableOpacity style = { [ style.quaternary, style.button, (subBlock.duration <= Workout.kMinDuration ?  style.disabled : {}), style.padding, style.border, style.outline ] }
                     disabled = { subBlock.duration <= Workout.kMinDuration }
                     onPressIn = { () => { decreaseDuration(block.id, subBlock); } }
                     onPressOut = { () => { stopTimer(); } }
                 >
-                    <MaterialIcons name = 'remove' size = { theme.iconSize.sm }/>
+                    <MaterialIcons name = 'remove' size = { theme.sizes.sm }/>
                 </TouchableOpacity>
                 <Text style = { [ style.text, style.center, style.normal, style.bold, style.fixWidth, style.marginHorizontal ] }>
                     { formatDuration(subBlock.duration) }
@@ -83,9 +85,21 @@ export default function TimerSubBlockEditor({ workout, block, subBlock, onChange
                     onPressIn = { () => { increaseDuration(block.id, subBlock); } }
                     onPressOut = { () => { stopTimer(); } }
                 >
-                    <MaterialIcons name = 'add' size = { theme.iconSize.sm }/>
+                    <MaterialIcons name = 'add' size = { theme.sizes.sm }/>
+                </TouchableOpacity>
+                <TouchableOpacity style = { [ style.quaternary, style.button, style.padding, style.border, style.outline ] }
+                    onPress = { () => { setShowColorPicker(true); } }
+                >
+                    <MaterialIcons name = 'format-color-fill' size = { theme.sizes.sm }/>
                 </TouchableOpacity>
             </View>
+
+            <ColorPickerModal 
+                color = { subBlock.color }
+                visible = { showColorPicker }
+                onClose = { () => { setShowColorPicker(false); } }
+                onColorChange = { (color) => { subBlock.color = color; onChange(); } }
+            />
         </>
     );
 }

@@ -197,7 +197,7 @@ export default function TimerScreen() {
                             Set {setsIndex + 1} / {block.sets}
                         </Text>
                     </View>
-                    <View style = { [ style.tertiary, style.marginTop, style.padding, style.middle, style.border, style.outlineThick, style.flex1 ] }>
+                    <View style = { [ { backgroundColor: subBlock.color }, style.marginTop, style.padding, style.middle, style.border, style.outlineThick, style.flex1 ] }>
                         <Text style = { [ style.text, style.xlarge, style.bold, style.center ] } numberOfLines = { 1 }>
                             { formatDuration(timeLeft) }
                         </Text>
