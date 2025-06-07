@@ -51,16 +51,16 @@ export default function HomeScreen() {
         const workout: Workout = new Workout({ id: generateId(), name: 'New Workout' });
         {
             const blockId: number = workout.createBlock();
-            workout.createSubBlock(blockId, 'Prepare');
+            workout.createSubBlock(blockId, 'Prepare', 5);
         }
         {
             const blockId: number = workout.createBlock();
-            workout.createSubBlock(blockId, 'Work');
-            workout.createSubBlock(blockId, 'Rest');
+            workout.createSubBlock(blockId, 'Work', 10);
+            workout.createSubBlock(blockId, 'Rest', 10);
         }
         {
             const blockId: number = workout.createBlock();
-            workout.createSubBlock(blockId, 'Cooldown');
+            workout.createSubBlock(blockId, 'Cooldown', 30);
         }
         return workout;
     }
