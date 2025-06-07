@@ -39,26 +39,19 @@ export default function SetupScreen() {
     const style = StyleSheet.create({ ...useStyles(theme) })
 
     // attributes
-    const [ , forceUpdate ] = useState(false);
-    const { workout }       = route.params;
-    const flatList          = useRef<FlatList>(null);
+    const { workout, pendingSave }              = route.params;
+    const [ , forceUpdate ]                     = useState(false);
+    const [ pendingChanges, setPendingChanges ] = useState(pendingSave);
+    const flatList                              = useRef<FlatList>(null);
 
     // methods
     const createBlock = () => {
-        const blockId: number = workout.addBlock({
-            sets: 1,
-            subBlocks: []
-        });
-        createSubBlock(blockId);
-        flatList.current?.scrollToEnd({ animated: true });
-    };
-
-    const createSubBlock = (blockId: number) => {
-        workout.addSubBlock(blockId, {
-            label: 'New Block',
-            duration: 10
-        });
+        {
+            const blockId: number = workout.createBlock();
+            workout.createSubBlock(blockId, 'New Block');
+        }
         update();
+        flatList.current?.scrollToEnd({ animated: true });
     };
 
     const deleteBlock = (blockId: number) => {
@@ -89,10 +82,12 @@ export default function SetupScreen() {
     }
 
     const saveAsync = async () => {
+        setPendingChanges(false);
         await saveWorkout(Workout.kStorageKey, workout);
     };
 
     const update = () => {
+        setPendingChanges(true);
         forceUpdate((prev) => !prev);
     }
 
@@ -112,7 +107,8 @@ export default function SetupScreen() {
                     >
                         <MaterialIcons name = 'play-arrow' size = { theme.iconSize.sm }/>
                     </TouchableOpacity>
-                    <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.padding, style.button, style.border, style.outline ] }
+                    <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.padding, style.button, (!pendingChanges ?  style.disabled : {}), style.border, style.outline ] }
+                        disabled = { !pendingChanges }
                         onPress = { () => { saveAsync(); }}
                     >
                         <MaterialIcons name = 'save' size = { theme.iconSize.sm }/>

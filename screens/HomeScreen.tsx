@@ -48,7 +48,21 @@ export default function HomeScreen() {
 
     // methods
     const createWorkout = () => {
-        return new Workout({ id: generateId(), name: 'New Workout' });
+        const workout: Workout = new Workout({ id: generateId(), name: 'New Workout' });
+        {
+            const blockId: number = workout.createBlock();
+            workout.createSubBlock(blockId, 'Prepare');
+        }
+        {
+            const blockId: number = workout.createBlock();
+            workout.createSubBlock(blockId, 'Work');
+            workout.createSubBlock(blockId, 'Rest');
+        }
+        {
+            const blockId: number = workout.createBlock();
+            workout.createSubBlock(blockId, 'Cooldown');
+        }
+        return workout;
     }
 
     const removeWorkout = (workout: Workout) => {
@@ -87,7 +101,7 @@ export default function HomeScreen() {
                     Workouts
                 </Text>
                 <TouchableOpacity style = { [ style.quaternary, style.padding, style.button, style.border, style.outline ] }
-                    onPress = { () => { navigation.navigate('Setup', { workout: createWorkout() }); } }
+                    onPress = { () => { navigation.navigate('Setup', { workout: createWorkout(), pendingSave: true }); } }
                 >
                     <MaterialIcons name = 'add' size = { theme.iconSize.sm }/>
                 </TouchableOpacity>
@@ -117,7 +131,7 @@ export default function HomeScreen() {
                                     <MaterialIcons name = 'play-arrow' size = { theme.iconSize.sm }/>
                                 </TouchableOpacity>
                                 <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.padding, style.button, style.border, style.outline ] }
-                                    onPress = { () => { navigation.navigate('Setup', { workout }); }}
+                                    onPress = { () => { navigation.navigate('Setup', { workout: workout, pendingSave: false }); }}
                                 >
                                     <MaterialIcons name = 'edit' size = { theme.iconSize.sm }/>
                                 </TouchableOpacity>

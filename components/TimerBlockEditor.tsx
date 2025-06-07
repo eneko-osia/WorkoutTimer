@@ -42,10 +42,7 @@ export default function TimerBlockEditor({ workout, block, onChange }: Props) {
 
     // methods
     const createSubBlock = (blockId: number) => {
-        workout.addSubBlock(blockId, {
-            label: 'New Block',
-            duration: 10
-        });
+        workout.createSubBlock(blockId, 'New Block');
         onChange();
     };
 

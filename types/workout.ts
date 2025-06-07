@@ -71,6 +71,20 @@ export class Workout {
         return 0;
     }
 
+    createBlock(sets: number = 1): number {
+        return this.addBlock({
+            sets: sets,
+            subBlocks: []
+        });
+    };
+
+    createSubBlock(blockId: number, label: string, duration: number = 10): number {
+        return this.addSubBlock(blockId, {
+            label: label,
+            duration: duration
+        });
+    };
+
     deleteBlock(blockId: number) {
         this._blocks = this._blocks.filter((b) => b.id !== blockId);
     }
