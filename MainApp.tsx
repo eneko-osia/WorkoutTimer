@@ -33,7 +33,7 @@ export default function MainApp() {
     return (
         <>
             <StatusBar
-                barStyle = { (scheme === 'dark' ? 'dark-content' : 'light-content') }
+                barStyle = { (scheme === 'dark' ? 'light-content' : 'dark-content') }
                 hidden = { false }
                 translucent = { false }
                 backgroundColor = 'transparent'
