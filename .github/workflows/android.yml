@@ -15,13 +15,17 @@ on:
             - '**.md'
 
 jobs:
-    build-android:
+    build:
         name: Build Android
-        runs-on: ubuntu-latest
+        runs-on: ${{matrix.os}}
+        strategy:
+            matrix:
+                os: [ ubuntu-latest ]
+                build_type: [ assembleDebug ]
 
         steps:
         - name: Checkout repository
-          uses: actions/checkout@v3
+          uses: actions/checkout@v4
 
         - name: Set up Java
           uses: actions/setup-java@v3
@@ -50,6 +54,12 @@ jobs:
             restore-keys: |
                 ${{ runner.os }}-gradle-
 
-        - name: Build Android (assembleDebug)
+        - name: Build
           working-directory: android
-          run: ./gradlew assembleDebug
+          run: ./gradlew ${{matrix.build_type}}
+
+        # - name: Upload debug APK
+        #   uses: actions/upload-artifact@v3
+        #   with:
+        #     name: WorkoutTimer-debug-apk
+        #     path: android/app/build/outputs/apk/debug/WorkoutTimer-debug.apk
