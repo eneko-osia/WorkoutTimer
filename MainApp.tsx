@@ -14,8 +14,8 @@ import { RootStackParamList } from './src/navigation/types';
 import { useStyles } from './src/styles/common';
 import { useTheme } from './src/styles/theme';
 import HomeScreen from  './src/screens/HomeScreen';
-// import SetupScreen from './screens/SetupScreen';
-// import TimerScreen from './screens/TimerScreen';
+import SetupScreen from './src/screens/SetupScreen';
+import TimerScreen from './src/screens/TimerScreen';
 
 // navigation
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -42,8 +42,8 @@ export default function MainApp() {
                 <NavigationContainer theme = { theme } >
                     <Stack.Navigator initialRouteName = 'Home'>
                         <Stack.Screen name = 'Home' component = { HomeScreen } />
-                        {/* <Stack.Screen name = 'Setup' component = { SetupScreen } />
-                        <Stack.Screen name = 'Timer' component = { TimerScreen } /> */}
+                        <Stack.Screen name = 'Setup' component = { SetupScreen } />
+                        <Stack.Screen name = 'Timer' component = { TimerScreen } />
                     </Stack.Navigator>
                 </NavigationContainer>
             </GestureHandlerRootView>
