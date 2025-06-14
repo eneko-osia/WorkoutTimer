@@ -6,7 +6,7 @@ import {
     useColorScheme,
 } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-// import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 
 // project imports
@@ -38,7 +38,7 @@ export default function MainApp() {
                 translucent = { false }
                 backgroundColor = 'transparent'
             />
-            {/* <GestureHandlerRootView style = { style.flex1 } > */}
+            <GestureHandlerRootView style = { style.flex1 } >
                 <NavigationContainer theme = { theme } >
                     <Stack.Navigator initialRouteName = 'Home'>
                         <Stack.Screen name = 'Home' component = { HomeScreen } />
@@ -46,7 +46,7 @@ export default function MainApp() {
                         <Stack.Screen name = 'Timer' component = { TimerScreen } /> */}
                     </Stack.Navigator>
                 </NavigationContainer>
-            {/* </GestureHandlerRootView> */}
+            </GestureHandlerRootView>
         </>
     );
 }
