@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 // import { AudioPlayer, useAudioPlayer } from 'expo-audio';
 import { RouteProp, useRoute } from '@react-navigation/native';
-// import { useKeepAwake } from 'expo-keep-awake';
+import IdleTimerManager from 'react-native-idle-timer';
 
 // project imports
 import { formatDuration } from '../utils/format';
@@ -25,7 +25,6 @@ export default function TimerScreen() {
     // hooks
     const route     = useRoute<TimerScreenRouteProp>();
     const scheme    = useColorScheme();
-    // useKeepAwake();
 
     // theme
     const theme = useTheme(scheme);
@@ -59,6 +58,8 @@ export default function TimerScreen() {
             setSets(set);
             setTimeLeft(subBlock.duration);
         }
+
+        IdleTimerManager.setIdleTimerDisabled(true);
 
         let blockIndex = 0;
         let subBlockIndex = 0;
@@ -110,6 +111,7 @@ export default function TimerScreen() {
         return () => {
             setIsRunning(false);
             clearTimeout(timer.current!);
+            IdleTimerManager.setIdleTimerDisabled(false);
         }
     }, []);
 
