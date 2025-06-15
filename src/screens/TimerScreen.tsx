@@ -49,10 +49,10 @@ export default function TimerScreen() {
     // effects
     useEffect(() => {
         const findNextBlock = (blockIndex: number = 0, subBlockIndex: number = -1, set: number = 1) => {
-            const block = workout.blocks[blockIndex];
-            if ((subBlockIndex + 1) < block.subBlocks.length) {
+            const currentBlock = workout.blocks[blockIndex];
+            if ((subBlockIndex + 1) < currentBlock.subBlocks.length) {
                 return { blockIndex: blockIndex, subBlockIndex: (subBlockIndex + 1), set: set };
-            } else if ((set + 1) <= block.sets) {
+            } else if ((set + 1) <= currentBlock.sets) {
                 return { blockIndex: blockIndex, subBlockIndex: 0, set: (set + 1) };
             } else if ((blockIndex + 1) < workout.blocks.length) {
                 return { blockIndex: (blockIndex + 1), subBlockIndex: 0, set: 1 };
@@ -61,12 +61,12 @@ export default function TimerScreen() {
         }
 
         const setState = (blockIndex: number, subBlockIndex: number, set: number) => {
-            const block = workout.blocks[blockIndex];
-            const subBlock = block.subBlocks[subBlockIndex];
-            setBlock(block);
-            setSubBlock(subBlock);
+            const currentBlock = workout.blocks[blockIndex];
+            const currentSubBlock = currentBlock.subBlocks[subBlockIndex];
+            setBlock(currentBlock);
+            setSubBlock(currentSubBlock);
             setSets(set);
-            setTimeLeft(subBlock.duration);
+            setTimeLeft(currentSubBlock.duration);
         }
 
         // keep awake
@@ -87,25 +87,25 @@ export default function TimerScreen() {
 
         setIsRunning(true);
         timer.current = setInterval(() => {
-            const block = workout.blocks[blockIndex];
-            const subBlock = block.subBlocks[subBlockIndex];
+            const currentBlock = workout.blocks[blockIndex];
+            const currentSubBlock = currentBlock.subBlocks[subBlockIndex];
 
             const millisecondElapsed = Math.max(0, Date.now() - start);
             const secondsElapsed = Math.floor(millisecondElapsed / 1000);
-            const millisecondLeft = Math.max(0, (subBlock.duration * 1000) - millisecondElapsed);
+            const millisecondLeft = Math.max(0, (currentSubBlock.duration * 1000) - millisecondElapsed);
             const secondsLeft = Math.ceil(millisecondLeft / 1000);
 
             setElapsedTime(totalElapsed + secondsElapsed);
             setTimeLeft(secondsLeft);
 
             // play beep sound effect only in the last 3 seconds
-            if ((secondsLeft >= 1 && secondsLeft <= 3) && (lastBeepSound != secondsLeft)) {
+            if ((secondsLeft >= 1 && secondsLeft <= 3) && (lastBeepSound !== secondsLeft)) {
                 lastBeepSound = secondsLeft;
                 SoundPlayer.playSoundFile('beep', 'wav');
             }
 
             // time block has finished
-            if (millisecondLeft == 0) {
+            if (millisecondLeft === 0) {
                 SoundPlayer.playSoundFile('beep_long', 'wav');
                 const next = findNextBlock(blockIndex, subBlockIndex, set);
                 if (next) {

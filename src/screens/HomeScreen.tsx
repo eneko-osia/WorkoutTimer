@@ -89,8 +89,8 @@ export default function HomeScreen() {
         setWorkouts(await loadWorkouts(Workout.kStorageKey));
     };
 
-    const saveAsync = async (workouts: Workout[]) => {
-        await saveWorkouts(Workout.kStorageKey, workouts);
+    const saveAsync = async (_workouts: Workout[]) => {
+        await saveWorkouts(Workout.kStorageKey, _workouts);
     };
 
     // jsx

@@ -12,21 +12,19 @@ import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 // project imports
 import { formatDuration } from '../utils/format';
-import { TimerBlock, TimerSubBlock, Workout } from '../types/workout';
+import { TimerSubBlock, Workout } from '../types/workout';
 import { useStyles } from '../styles/common';
 import { useTheme } from '../styles/theme';
 import ColorPickerComponent from './ColorPickerComponent';
 
 // type definitions
 type Props = {
-    workout: Workout,
-    block: TimerBlock;
     subBlock: TimerSubBlock;
     onChange: () => void;
 };
 
 // component
-export default function TimerSubBlockEditor({ workout, block, subBlock, onChange }: Props) {
+export default function TimerSubBlockEditor({ subBlock, onChange }: Props) {
     // hooks
     const scheme = useColorScheme();
 
@@ -42,15 +40,15 @@ export default function TimerSubBlockEditor({ workout, block, subBlock, onChange
     const timer                                 = useRef<NodeJS.Timeout>(null);
 
     // methods
-    const decreaseDuration = (blockId: number, subBlock: TimerSubBlock, timeout: number = 250) => {
+    const decreaseDuration = (timeout: number = 250) => {
         subBlock.duration = Math.max(Workout.kMinDuration, subBlock.duration - 1)
-        timer.current = setTimeout(() => { decreaseDuration(blockId, subBlock, Math.max(1, timeout - 10)) }, timeout);
+        timer.current = setTimeout(() => { decreaseDuration(Math.max(1, timeout - 10)) }, timeout);
         onChange();
     };
 
-    const increaseDuration = (blockId: number, subBlock: TimerSubBlock, timeout: number = 250) => {
+    const increaseDuration = (timeout: number = 250) => {
         subBlock.duration = Math.min(Workout.kMaxDuration, subBlock.duration + 1)
-        timer.current = setTimeout(() => { increaseDuration(blockId, subBlock, Math.max(1, timeout - 10)) }, timeout);
+        timer.current = setTimeout(() => { increaseDuration(Math.max(1, timeout - 10)) }, timeout);
         onChange();
     };
 
@@ -73,7 +71,7 @@ export default function TimerSubBlockEditor({ workout, block, subBlock, onChange
                 <View style = { [ style.row, style.marginLeft, style.flex1 ] }>
                     <TouchableOpacity style = { [ style.quaternary, style.button, (subBlock.duration <= Workout.kMinDuration ?  style.disabled : {}), style.padding, style.border, style.outline ] }
                         disabled = { subBlock.duration <= Workout.kMinDuration }
-                        onPressIn = { () => { decreaseDuration(block.id, subBlock); } }
+                        onPressIn = { () => { decreaseDuration(); } }
                         onPressOut = { () => { stopTimer(); } }
                     >
                         <MaterialIcons name = 'remove' size = { theme.sizes.sm }/>
@@ -83,7 +81,7 @@ export default function TimerSubBlockEditor({ workout, block, subBlock, onChange
                     </Text>
                     <TouchableOpacity style = { [ style.quaternary, style.button, (subBlock.duration >= Workout.kMaxDuration ?  style.disabled : {}), style.padding, style.border, style.outline ] }
                         disabled = { subBlock.duration >= Workout.kMaxDuration }
-                        onPressIn = { () => { increaseDuration(block.id, subBlock); } }
+                        onPressIn = { () => { increaseDuration(); } }
                         onPressOut = { () => { stopTimer(); } }
                     >
                         <MaterialIcons name = 'add' size = { theme.sizes.sm }/>
@@ -98,7 +96,6 @@ export default function TimerSubBlockEditor({ workout, block, subBlock, onChange
                 </View>
             </View>
             <ColorPickerComponent
-                color = { subBlock.color }
                 visible = { showColorPicker }
                 onColorChange = { (color) => { subBlock.color = color; onChange(); } }
             />

@@ -137,8 +137,8 @@ export default function SetupScreen() {
                                     onChange = { update }
                                 />
                                 <View style = { [ style.tertiary, style.marginTop, style.row ] }>
-                                    <TouchableOpacity style = { [ style.quaternary, style.marginTop, style.padding, style.button, (index == 0 ?  style.disabled : {}), style.border, style.outline ] }
-                                        disabled = { index == 0 }
+                                    <TouchableOpacity style = { [ style.quaternary, style.marginTop, style.padding, style.button, (index === 0 ?  style.disabled : {}), style.border, style.outline ] }
+                                        disabled = { index === 0 }
                                         onPress = { () => { moveBlock(index, Math.max(0, index - 1)); } }
                                     >
                                         <MaterialIcons name = 'arrow-upward' size = { theme.sizes.sm }/>
@@ -149,8 +149,8 @@ export default function SetupScreen() {
                                     >
                                         <MaterialIcons name = 'delete' size = { theme.sizes.sm }/>
                                     </TouchableOpacity>
-                                    <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.marginTop, style.padding, (index == (workout.blocks.length - 1) ?  style.disabled : {}), style.button, style.border, style.outline ] }
-                                        disabled = { index == (workout.blocks.length - 1) }
+                                    <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.marginTop, style.padding, (index === (workout.blocks.length - 1) ?  style.disabled : {}), style.button, style.border, style.outline ] }
+                                        disabled = { index === (workout.blocks.length - 1) }
                                         onPress = { () => { moveBlock(index, Math.min((workout.blocks.length - 1), index + 1)); } }
                                     >
                                         <MaterialIcons name = 'arrow-downward' size = { theme.sizes.sm }/>

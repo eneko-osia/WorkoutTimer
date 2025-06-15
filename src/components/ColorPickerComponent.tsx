@@ -29,12 +29,9 @@ export default function ColorPickerComponent({ visible, onColorChange }: Props) 
     // jsx
     return (
         visible ? (
-            <View style = { [ style.padding, style.border ] } >
-                 <ColorPicker 
-                    onChangeJS = { (colors) => { onColorChange(colors.rgba); } } >
-                    <View style = { [ style.padding ] }>
-                        <Panel5 />
-                    </View>
+            <View style = { [ style.marginTop ] } >
+                 <ColorPicker onChangeJS = { (colors) => { onColorChange(colors.rgba); } }>
+                    <Panel5 style = { [ style.border ] } />
                 </ColorPicker>
             </View>
         ) : (
