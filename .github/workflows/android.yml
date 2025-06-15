@@ -3,13 +3,13 @@ name: android
 on:
   push:
     branches:
-      - 'master'
+      - 'main'
       - 'develop'
     paths-ignore:
       - '**.md'
   pull_request:
     branches:
-        - 'master'
+        - 'main'
         - 'develop'
     paths-ignore:
         - '**.md'
@@ -66,3 +66,4 @@ jobs:
       with:
         name: workout-timer-debug-apk
         path: android/app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 7
