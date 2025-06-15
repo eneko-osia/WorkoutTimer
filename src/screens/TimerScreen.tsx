@@ -6,9 +6,9 @@ import {
     useColorScheme,
     View,
 } from 'react-native';
-// import { AudioPlayer, useAudioPlayer } from 'expo-audio';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import IdleTimerManager from 'react-native-idle-timer';
+import SoundPlayer from 'react-native-sound-player';
 
 // project imports
 import { formatDuration } from '../utils/format';
@@ -44,12 +44,22 @@ export default function TimerScreen() {
     const [ subBlock,       setSubBlock]        = useState<TimerSubBlock>();
     const [ timeLeft,       setTimeLeft ]       = useState(0);
     const { workout }                           = route.params;
-    // const beepLongSound                         = useAudioPlayer(require('../assets/sounds/beep_long.wav'));
-    // const beepSound                             = useAudioPlayer(require('../assets/sounds/beep.wav'));
     const timer                                 = useRef<NodeJS.Timeout | null>(null);
 
     // effects
     useEffect(() => {
+        const findNextBlock = (blockIndex: number = 0, subBlockIndex: number = -1, set: number = 1) => {
+            const block = workout.blocks[blockIndex];
+            if ((subBlockIndex + 1) < block.subBlocks.length) {
+                return { blockIndex: blockIndex, subBlockIndex: (subBlockIndex + 1), set: set };
+            } else if ((set + 1) <= block.sets) {
+                return { blockIndex: blockIndex, subBlockIndex: 0, set: (set + 1) };
+            } else if ((blockIndex + 1) < workout.blocks.length) {
+                return { blockIndex: (blockIndex + 1), subBlockIndex: 0, set: 1 };
+            }
+            return null;
+        }
+
         const setState = (blockIndex: number, subBlockIndex: number, set: number) => {
             const block = workout.blocks[blockIndex];
             const subBlock = block.subBlocks[subBlockIndex];
@@ -59,7 +69,12 @@ export default function TimerScreen() {
             setTimeLeft(subBlock.duration);
         }
 
+        // keep awake
         IdleTimerManager.setIdleTimerDisabled(true);
+
+        // load sound files
+        SoundPlayer.loadSoundFile('beep_long', 'wav');
+        SoundPlayer.loadSoundFile('beep', 'wav');
 
         let blockIndex = 0;
         let subBlockIndex = 0;
@@ -70,6 +85,7 @@ export default function TimerScreen() {
         let totalElapsed = 0;
         setState(blockIndex, subBlockIndex, set);
 
+        setIsRunning(true);
         timer.current = setInterval(() => {
             const block = workout.blocks[blockIndex];
             const subBlock = block.subBlocks[subBlockIndex];
@@ -85,12 +101,12 @@ export default function TimerScreen() {
             // play beep sound effect only in the last 3 seconds
             if ((secondsLeft >= 1 && secondsLeft <= 3) && (lastBeepSound != secondsLeft)) {
                 lastBeepSound = secondsLeft;
-                // playSound(beepSound);
+                SoundPlayer.playSoundFile('beep', 'wav');
             }
 
             // time block has finished
             if (millisecondLeft == 0) {
-                // playSound(beepLongSound);
+                SoundPlayer.playSoundFile('beep_long', 'wav');
                 const next = findNextBlock(blockIndex, subBlockIndex, set);
                 if (next) {
                     blockIndex = next.blockIndex;
@@ -113,26 +129,7 @@ export default function TimerScreen() {
             clearTimeout(timer.current!);
             IdleTimerManager.setIdleTimerDisabled(false);
         }
-    }, []);
-
-    // methods
-
-    const findNextBlock = (blockIndex: number = 0, subBlockIndex: number = -1, set: number = 1) => {
-        const block = workout.blocks[blockIndex];
-        if ((subBlockIndex + 1) < block.subBlocks.length) {
-            return { blockIndex: blockIndex, subBlockIndex: (subBlockIndex + 1), set: set };
-        } else if ((set + 1) <= block.sets) {
-            return { blockIndex: blockIndex, subBlockIndex: 0, set: (set + 1) };
-        } else if ((blockIndex + 1) < workout.blocks.length) {
-            return { blockIndex: (blockIndex + 1), subBlockIndex: 0, set: 1 };
-        }
-        return null;
-    }
-
-    // const playSound = (player: AudioPlayer) => {
-    //     player.seekTo(0);
-    //     player.play();
-    // };
+    }, [ workout ]);
 
     // jsx
     return (
