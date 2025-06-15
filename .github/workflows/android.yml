@@ -22,7 +22,7 @@ jobs:
             matrix:
                 os: [ ubuntu-24.04 ]
                 build_type: [ assembleDebug, assembleRelease ]
-                node-version: [ '23.x' ]
+                node-version: [ '18.x', '23.x' ]
             fail-fast: false
 
         steps:
