@@ -21,7 +21,7 @@ jobs:
         strategy:
             matrix:
                 os: [ ubuntu-24.04 ]
-                build_type: [ assembleDebug, assembleRelease ]
+                build_type: [ assembleRelease ]
                 node-version: [ '18.x' ]
             fail-fast: false
 
@@ -46,15 +46,15 @@ jobs:
         - name: Run Lint
           run: npm run lint
 
-        # - name: Cache Gradle
-        #   uses: actions/cache@v4
-        #   with:
-        #     path: |
-        #         ~/.gradle/caches
-        #         ~/.gradle/wrapper
-        #     key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        #     restore-keys: |
-        #         ${{ runner.os }}-gradle-
+        - name: Cache Gradle
+          uses: actions/cache@v4
+          with:
+            path: |
+                ~/.gradle/caches
+                ~/.gradle/wrapper
+            key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+            restore-keys: |
+                ${{ runner.os }}-gradle-
 
         - name: Build
           working-directory: android
