@@ -1,4 +1,4 @@
-package com.workouttimer
+package com.joganera.workouttimer
 
 import android.app.Application
 import com.facebook.react.PackageList
