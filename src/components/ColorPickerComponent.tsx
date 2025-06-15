@@ -5,7 +5,7 @@ import {
     useColorScheme,
     View,
 } from 'react-native';
-// import ColorPicker from 'react-native-wheel-color-picker';
+import ColorPicker, { Panel5 } from 'reanimated-color-picker';
 
 // project imports
 import { useStyles } from '../styles/common';
@@ -13,13 +13,12 @@ import { useTheme } from '../styles/theme';
 
 // type definitions
 type Props = {
-    color: string;
     visible: boolean;
     onColorChange: (color: string) => void;
 };
 
 // component
-export default function ColorPickerComponent({ color, visible, onColorChange }: Props) {
+export default function ColorPickerComponent({ visible, onColorChange }: Props) {
     // hooks
     const scheme = useColorScheme();
 
@@ -31,14 +30,12 @@ export default function ColorPickerComponent({ color, visible, onColorChange }: 
     return (
         visible ? (
             <View style = { [ style.padding, style.border ] } >
-                {/* <ColorPicker
-                    color = { color }
-                    row = { false }
-                    sliderSize = { theme.sizes.sm }
-                    swatches = { false }
-                    thumbSize = { theme.sizes.sm }
-                    onColorChangeComplete = { onColorChange }
-                /> */}
+                 <ColorPicker 
+                    onChangeJS = { (colors) => { onColorChange(colors.rgba); } } >
+                    <View style = { [ style.padding ] }>
+                        <Panel5 />
+                    </View>
+                </ColorPicker>
             </View>
         ) : (
             <></>
