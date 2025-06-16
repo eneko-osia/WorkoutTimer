@@ -1,18 +1,6 @@
 name: android
 
 on:
-  push:
-    branches:
-      - 'main'
-      - 'develop'
-    paths-ignore:
-      - '**.md'
-  pull_request:
-    branches:
-        - 'main'
-        - 'develop'
-    paths-ignore:
-        - '**.md'
   workflow_dispatch:
 
 jobs:
@@ -22,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-24.04 ]
-        node: [ '18.x' ]
+        node: [ '23.x' ]
       fail-fast: false
 
     steps:
@@ -58,12 +46,11 @@ jobs:
 
     - name: Build
       working-directory: android
-      run: ./gradlew assembleDebug
+      run: ./gradlew assembleRelease
 
     - name: Upload
-      if: github.repository == 'main'
       uses: actions/upload-artifact@v4
       with:
-        name: workout-timer-debug-apk
-        path: android/app/build/outputs/apk/debug/app-debug.apk
+        name: workout-timer-release-apk
+        path: android/app/build/outputs/apk/release/app-release.apk
         retention-days: 7
