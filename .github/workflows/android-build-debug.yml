@@ -17,7 +17,7 @@ on:
 
 jobs:
   build:
-    name: Build Android
+    name: Build Android (Debug)
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
