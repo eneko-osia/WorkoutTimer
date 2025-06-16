@@ -3,7 +3,7 @@
 A customizable interval workout timer built with **React Native**.
 This app allows you to define workout blocks with nested sub-blocks (e.g. warm-up, work, rest), set durations, and set counts.
 
-![android](https://github.com/eneko-osia/WorkoutTimer/actions/workflows/android-build-debug.yml/badge.svg?branch=develop)
+[![Android](https://github.com/eneko-osia/WorkoutTimer/actions/workflows/android-ci.yml/badge.svg?branch=develop)](https://github.com/eneko-osia/WorkoutTimer/actions/workflows/android-ci.yml)
 
 ---
 
