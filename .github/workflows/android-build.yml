@@ -6,15 +6,9 @@ on:
       build-type:
         required: true
         type: string
-      node-version:
-        required: true
-        type: string
   workflow_dispatch:
     inputs:
       build-type:
-        required: true
-        type: string
-      node-version:
         required: true
         type: string
 
@@ -24,6 +18,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-24.04 ]
+        node-version: [ '23' ]
       fail-fast: false
 
     steps:
@@ -39,7 +34,7 @@ jobs:
     - name: Setup Node
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ inputs.node-version }}
+        node-version: ${{ matrix.node-version }}
 
     - name: Install dependencies
       run: npm install
@@ -61,3 +56,10 @@ jobs:
       working-directory: android
       run: ./gradlew assemble${{ inputs.build-type == 'release' && 'Release' || 'Debug' }}
 
+    - name: Upload
+      if: github.repository == 'main'
+      uses: actions/upload-artifact@v4
+      with:
+        name: workout-timer-${{ inputs.build-type }}-apk
+        path: android/app/build/outputs/apk/${{ inputs.build-type }}/app-${{ inputs.build-type }}.apk
+        retention-days: 7

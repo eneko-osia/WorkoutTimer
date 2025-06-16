@@ -6,12 +6,6 @@ on:
 
 jobs:
   build-debug:
-    strategy:
-      matrix:
-        node-version: [ '18.x', '23.x' ]
-      fail-fast: false
-
     uses: ./.github/workflows/android-build.yml
     with:
       build-type: debug
-      node-version: ${{ matrix.node-version }}

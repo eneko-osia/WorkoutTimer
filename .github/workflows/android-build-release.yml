@@ -1,69 +1,11 @@
-name: android build release
+name: Android Build [Release]
 
 on:
-  # push:
-  #   branches:
-  #     - 'main'
-  #     - 'develop'
-  #   paths-ignore:
-  #     - '**.md'
-  # pull_request:
-  #   branches:
-  #       - 'main'
-  #       - 'develop'
-  #   paths-ignore:
-  #       - '**.md'
+  workflow_call:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build Android (Release)
-    runs-on: ${{matrix.os}}
-    strategy:
-      matrix:
-        os: [ ubuntu-24.04 ]
-        node: [ '18.x', '23.x' ]
-      fail-fast: false
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Set up Java
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-
-    - name: Set up Node
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node }}
-
-    - name: Install dependencies
-      run: npm install
-
-    - name: Run Lint
-      run: npm run lint
-
-    - name: Cache Gradle
-      uses: actions/cache@v4
-      with:
-        path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-            ${{ runner.os }}-gradle-
-
-    - name: Build
-      working-directory: android
-      run: ./gradlew assembleRelease
-
-    - name: Upload
-      if: github.repository == 'main'
-      uses: actions/upload-artifact@v4
-      with:
-        name: workout-timer-release-apk
-        path: android/app/build/outputs/apk/release/app-release.apk
-        retention-days: 7
+  build-release:
+    uses: ./.github/workflows/android-build.yml
+    with:
+      build-type: release
