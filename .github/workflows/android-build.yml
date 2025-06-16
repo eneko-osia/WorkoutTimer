@@ -1,0 +1,63 @@
+name: Android Build
+
+on:
+  workflow_call:
+    inputs:
+      build-type:
+        required: true
+        type: string
+      node-version:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      build-type:
+        required: true
+        type: string
+      node-version:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ ubuntu-24.04 ]
+      fail-fast: false
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run Lint
+      run: npm run lint
+
+    - name: Cache Gradle
+      uses: actions/cache@v4
+      with:
+        path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+            ${{ runner.os }}-gradle-
+
+    - name: Build
+      working-directory: android
+      run: ./gradlew assemble${{ inputs.build-type == 'release' && 'Release' || 'Debug' }}
+
