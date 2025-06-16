@@ -1,4 +1,4 @@
-name: android
+name: android build debug
 
 on:
   push:
@@ -59,3 +59,11 @@ jobs:
     - name: Build
       working-directory: android
       run: ./gradlew assembleDebug
+
+    - name: Upload
+      if: github.repository == 'main'
+      uses: actions/upload-artifact@v4
+      with:
+        name: workout-timer-debug-apk
+        path: android/app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 7
