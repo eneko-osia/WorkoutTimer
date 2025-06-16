@@ -1,0 +1,11 @@
+name: Android Build [Release]
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  build-release:
+    uses: ./.github/workflows/android-build.yml
+    with:
+      build-type: release

@@ -1,0 +1,11 @@
+name: Android Build [Debug]
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  build-debug:
+    uses: ./.github/workflows/android-build.yml
+    with:
+      build-type: debug

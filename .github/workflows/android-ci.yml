@@ -1,0 +1,21 @@
+name: Android
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'develop'
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    branches:
+        - 'main'
+        - 'develop'
+    paths-ignore:
+        - '**.md'
+
+jobs:
+  build-debug:
+    uses: ./.github/workflows/android-build-debug.yml
+  # build-release:
+  #   uses: ./.github/workflows/android-build-release.yml

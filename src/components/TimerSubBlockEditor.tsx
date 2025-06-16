@@ -8,6 +8,7 @@ import {
     useColorScheme,
     View,
 } from 'react-native';
+import ColorPicker, { Panel5 } from 'reanimated-color-picker';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 // project imports
@@ -15,7 +16,6 @@ import { formatDuration } from '../utils/format';
 import { TimerSubBlock, Workout } from '../types/workout';
 import { useStyles } from '../styles/common';
 import { useTheme } from '../styles/theme';
-import ColorPickerComponent from './ColorPickerComponent';
 
 // type definitions
 type Props = {
@@ -95,10 +95,15 @@ export default function TimerSubBlockEditor({ subBlock, onChange }: Props) {
                     </TouchableOpacity>
                 </View>
             </View>
-            <ColorPickerComponent
-                visible = { showColorPicker }
-                onColorChange = { (color) => { subBlock.color = color; onChange(); } }
-            />
+            {showColorPicker ? (
+                <View style = { [ style.marginTop ] } >
+                    <ColorPicker onChangeJS = { (colors) => { subBlock.color = colors.rgba; onChange(); }}>
+                        <Panel5 style = { [ style.border ] } />
+                    </ColorPicker>
+                </View>
+            ) : (
+                <></>
+            )}
         </>
     );
 }
