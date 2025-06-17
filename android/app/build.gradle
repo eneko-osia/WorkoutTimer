@@ -99,9 +99,6 @@ android {
                 keyAlias MYAPP_UPLOAD_KEY_ALIAS
                 keyPassword MYAPP_UPLOAD_KEY_PASSWORD
             }
-            else {
-                throw new GradleException("Signing properties not defined")
-            }
         }
     }
     buildTypes {
