@@ -2,6 +2,18 @@ name: Android Build [Release]
 
 on:
   workflow_call:
+    secrets:
+      MYAPP_UPLOAD_STORE_BASE64:
+        required: false
+      MYAPP_UPLOAD_STORE_FILE:
+        required: false
+      MYAPP_UPLOAD_STORE_PASSWORD:
+        required: false
+      MYAPP_UPLOAD_KEY_ALIAS:
+        required: false
+      MYAPP_UPLOAD_KEY_PASSWORD:
+        required: false
+
   workflow_dispatch:
 
 jobs:
