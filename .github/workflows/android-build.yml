@@ -52,6 +52,21 @@ jobs:
         restore-keys: |
             ${{ runner.os }}-gradle-
 
+    - name: Decode keystore
+      if: ${{ inputs.build-type == 'release' }}
+      run: echo "${{ secrets.MYAPP_UPLOAD_STORE_BASE64 }}" | base64 --decode > android/app/${{ secrets.MYAPP_UPLOAD_STORE_FILE }}
+
+    - name: Create gradle.properties
+      if: ${{ inputs.build-type == 'release' }}
+      run: |
+        mkdir -p $HOME/.gradle
+        cat <<EOF > $HOME/.gradle/gradle.properties
+        MYAPP_RELEASE_STORE_FILE=${{ secrets.MYAPP_UPLOAD_STORE_FILE }}
+        MYAPP_RELEASE_KEY_ALIAS=${{ secrets.MYAPP_UPLOAD_KEY_ALIAS }}
+        MYAPP_RELEASE_STORE_PASSWORD=${{ secrets.MYAPP_UPLOAD_STORE_PASSWORD }}
+        MYAPP_RELEASE_KEY_PASSWORD=${{ secrets.MYAPP_UPLOAD_KEY_PASSWORD }}
+        EOF
+
     - name: Generate Codegen
       working-directory: android
       run: ./gradlew generateCodegenArtifactsFromSchema
