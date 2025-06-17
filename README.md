@@ -28,7 +28,7 @@ This app allows you to define workout blocks with nested sub-blocks (e.g. warm-u
 
 ### Prerequisites
 
-- Node.js ≥ 18
+- Node.js ≥ 23
 - Java Development Kit (JDK 17+)
 - Android Studio (Android SDK, virtual devices)
 - React Native CLI (https://reactnative.dev/docs/environment-setup)
