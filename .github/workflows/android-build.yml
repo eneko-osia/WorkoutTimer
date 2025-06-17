@@ -90,14 +90,6 @@ jobs:
         MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.MYAPP_UPLOAD_KEY_PASSWORD }}
         EOF
 
-    - name: Debug Secrets
-      run: |
-        if [ -z "${{ secrets.MYAPP_UPLOAD_KEY_ALIAS }}" ]; then
-          echo "MYAPP_UPLOAD_KEY_ALIAS is EMPTY"
-        else
-          echo "MYAPP_UPLOAD_KEY_ALIAS is SET (value not shown)"
-        fi
-
     - name: Generate Codegen
       working-directory: android
       run: ./gradlew generateCodegenArtifactsFromSchema
