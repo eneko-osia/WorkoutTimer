@@ -84,18 +84,18 @@ jobs:
       run: |
         mkdir -p $HOME/.gradle
         cat <<EOF > $HOME/.gradle/gradle.properties
-        MYAPP_RELEASE_STORE_FILE=${{ secrets.MYAPP_UPLOAD_STORE_FILE }}
-        MYAPP_RELEASE_KEY_ALIAS=${{ secrets.MYAPP_UPLOAD_KEY_ALIAS }}
-        MYAPP_RELEASE_STORE_PASSWORD=${{ secrets.MYAPP_UPLOAD_STORE_PASSWORD }}
-        MYAPP_RELEASE_KEY_PASSWORD=${{ secrets.MYAPP_UPLOAD_KEY_PASSWORD }}
+        MYAPP_UPLOAD_STORE_FILE=${{ secrets.MYAPP_UPLOAD_STORE_FILE }}
+        MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.MYAPP_UPLOAD_KEY_ALIAS }}
+        MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.MYAPP_UPLOAD_STORE_PASSWORD }}
+        MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.MYAPP_UPLOAD_KEY_PASSWORD }}
         EOF
 
     - name: Debug Secrets
       run: |
-        if [ -z "${{ secrets.MYAPP_RELEASE_KEY_ALIAS }}" ]; then
-          echo "MYAPP_RELEASE_KEY_ALIAS is EMPTY"
+        if [ -z "${{ secrets.MYAPP_UPLOAD_KEY_ALIAS }}" ]; then
+          echo "MYAPP_UPLOAD_KEY_ALIAS is EMPTY"
         else
-          echo "MYAPP_RELEASE_KEY_ALIAS is SET (value not shown)"
+          echo "MYAPP_UPLOAD_KEY_ALIAS is SET (value not shown)"
         fi
 
     - name: Generate Codegen
