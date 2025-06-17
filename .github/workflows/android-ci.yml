@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - 'main'
-      - 'develop'
+      # - 'develop'
     paths-ignore:
       - '**.md'
   pull_request:
@@ -17,5 +17,5 @@ on:
 jobs:
   build-debug:
     uses: ./.github/workflows/android-build-debug.yml
-  # build-release:
-  #   uses: ./.github/workflows/android-build-release.yml
+  build-release:
+    uses: ./.github/workflows/android-build-release.yml
