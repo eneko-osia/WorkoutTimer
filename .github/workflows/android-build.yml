@@ -99,7 +99,7 @@ jobs:
       run: ./gradlew assemble${{ inputs.build-type == 'release' && 'Release' || 'Debug' }}
 
     - name: Upload
-      if: github.repository == 'main'
+      if: github.ref == 'refs/heads/main'
       uses: actions/upload-artifact@v4
       with:
         name: workout-timer-${{ inputs.build-type }}-apk
