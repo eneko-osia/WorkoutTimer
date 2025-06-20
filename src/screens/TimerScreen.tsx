@@ -1,19 +1,21 @@
 // react imports
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
     StyleSheet,
     Text,
+    TouchableOpacity,
     useColorScheme,
     View,
 } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import IdleTimerManager from 'react-native-idle-timer';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
 import SoundPlayer from 'react-native-sound-player';
 
 // project imports
 import { formatDuration } from '../utils/format';
 import { RootStackParamList } from '../navigation/types';
-import { TimerBlock, TimerSubBlock } from '../types/workout';
+import { TimerPosition } from '../types/workout'
 import { useStyles } from '../styles/common';
 import { useTheme } from '../styles/theme';
 
@@ -37,38 +39,38 @@ export default function TimerScreen() {
     })
 
     // attributes
-    const [ block,          setBlock]           = useState<TimerBlock>();
-    const [ elapsedTime,    setElapsedTime ]    = useState(0);
-    const [ isRunning,      setIsRunning ]      = useState(true);
-    const [ sets,           setSets ]           = useState(0);
-    const [ subBlock,       setSubBlock]        = useState<TimerSubBlock>();
-    const [ timeLeft,       setTimeLeft ]       = useState(0);
     const { workout }                           = route.params;
-    const timer                                 = useRef<NodeJS.Timeout | null>(null);
+    const [ , forceUpdate ]                     = useState<boolean>(false);
+    const [ isPaused,       setIsPaused ]       = useState<boolean>(false);
+    const [ isRunning,      setIsRunning ]      = useState<boolean>(true);
+    const elapsedRef                            = useRef<number>(0);
+    const elapsedTotalRef                       = useRef<number>(0);
+    const nextRef                               = useRef<TimerPosition | null>(null);
+    const positionRef                           = useRef<TimerPosition>({ blockIndex: 0, subBlockIndex: 0, set: 1});
+    const prevRef                               = useRef<TimerPosition | null>(null);
+    const timeLeftRef                           = useRef<number>(0);
+    const timerRef                              = useRef<NodeJS.Timeout | null>(null);
+
+    // callbacks
+    const setState = useCallback((_position: TimerPosition, _elapsed: number = 0) => {
+        // set timer position
+        positionRef.current = _position;
+
+        // set elapsed
+        elapsedRef.current = _elapsed;
+        elapsedTotalRef.current = (_elapsed + workout.getDuration(_position));
+
+        // set time left
+        const _subBlock = workout.blocks[_position.blockIndex].subBlocks[_position.subBlockIndex];
+        timeLeftRef.current = (_subBlock.duration - _elapsed);
+
+        // find prev and next timer positions
+        nextRef.current = workout.findNextBlock(_position);
+        prevRef.current = workout.findPrevBlock(_position);
+    }, [ workout ]);
 
     // effects
     useEffect(() => {
-        const findNextBlock = (blockIndex: number = 0, subBlockIndex: number = -1, set: number = 1) => {
-            const currentBlock = workout.blocks[blockIndex];
-            if ((subBlockIndex + 1) < currentBlock.subBlocks.length) {
-                return { blockIndex: blockIndex, subBlockIndex: (subBlockIndex + 1), set: set };
-            } else if ((set + 1) <= currentBlock.sets) {
-                return { blockIndex: blockIndex, subBlockIndex: 0, set: (set + 1) };
-            } else if ((blockIndex + 1) < workout.blocks.length) {
-                return { blockIndex: (blockIndex + 1), subBlockIndex: 0, set: 1 };
-            }
-            return null;
-        }
-
-        const setState = (blockIndex: number, subBlockIndex: number, set: number) => {
-            const currentBlock = workout.blocks[blockIndex];
-            const currentSubBlock = currentBlock.subBlocks[subBlockIndex];
-            setBlock(currentBlock);
-            setSubBlock(currentSubBlock);
-            setSets(set);
-            setTimeLeft(currentSubBlock.duration);
-        }
-
         // keep awake
         IdleTimerManager.setIdleTimerDisabled(true);
 
@@ -76,60 +78,89 @@ export default function TimerScreen() {
         SoundPlayer.loadSoundFile('beep_long', 'wav');
         SoundPlayer.loadSoundFile('beep', 'wav');
 
-        let blockIndex = 0;
-        let subBlockIndex = 0;
-        let set = 1;
+        return () => {
+            IdleTimerManager.setIdleTimerDisabled(false);
+        }
+    }, []);
 
-        let lastBeepSound = 0;
-        let start = Date.now();
-        let totalElapsed = 0;
-        setState(blockIndex, subBlockIndex, set);
+    useEffect(() => {
+        if (isPaused) { return; }
 
-        setIsRunning(true);
-        timer.current = setInterval(() => {
-            const currentBlock = workout.blocks[blockIndex];
-            const currentSubBlock = currentBlock.subBlocks[subBlockIndex];
+        // initialize state
+        let _block = workout.blocks[positionRef.current.blockIndex];
+        let _subBlock = _block.subBlocks[positionRef.current.subBlockIndex];
+        let _elapsedTotal = elapsedTotalRef.current - elapsedRef.current;
+        let _lastBeepSound = Math.max(0, (_subBlock.duration - elapsedRef.current));;
+        let _start = (Date.now() - (elapsedRef.current * 1000));
+        setState(positionRef.current, elapsedRef.current);
 
-            const millisecondElapsed = Math.max(0, Date.now() - start);
-            const secondsElapsed = Math.floor(millisecondElapsed / 1000);
-            const millisecondLeft = Math.max(0, (currentSubBlock.duration * 1000) - millisecondElapsed);
-            const secondsLeft = Math.ceil(millisecondLeft / 1000);
+        timerRef.current = setInterval(() => {
+            // calculate elapsed time
+            const _millisecondElapsed = Math.max(0, Date.now() - _start);
+            const _secondsElapsed = Math.floor(_millisecondElapsed / 1000);
+            const _millisecondLeft = Math.max(0, (_subBlock.duration * 1000) - _millisecondElapsed);
+            const _secondsLeft = Math.ceil(_millisecondLeft / 1000);
 
-            setElapsedTime(totalElapsed + secondsElapsed);
-            setTimeLeft(secondsLeft);
+            // update state
+            elapsedRef.current = _secondsElapsed;
+            elapsedTotalRef.current = _elapsedTotal + _secondsElapsed;
+            timeLeftRef.current = _secondsLeft;
+            update();
 
             // play beep sound effect only in the last 3 seconds
-            if ((secondsLeft >= 1 && secondsLeft <= 3) && (lastBeepSound !== secondsLeft)) {
-                lastBeepSound = secondsLeft;
+            if ((_secondsLeft >= 1 && _secondsLeft <= 3) && (_lastBeepSound !== _secondsLeft)) {
+                _lastBeepSound = _secondsLeft;
                 SoundPlayer.playSoundFile('beep', 'wav');
             }
 
-            // time block has finished
-            if (millisecondLeft === 0) {
+            // timer block has finished
+            if (_millisecondLeft === 0) {
                 SoundPlayer.playSoundFile('beep_long', 'wav');
-                const next = findNextBlock(blockIndex, subBlockIndex, set);
-                if (next) {
-                    blockIndex = next.blockIndex;
-                    subBlockIndex = next.subBlockIndex;
-                    set = next.set;
+                if (nextRef.current) {
+                    // set next timer block
+                    positionRef.current = nextRef.current;
 
-                    lastBeepSound = 0;
-                    start = Date.now();
-                    totalElapsed = totalElapsed + secondsElapsed;
-                    setState(blockIndex, subBlockIndex, set);
+                    // initialize state
+                    _block = workout.blocks[positionRef.current.blockIndex];
+                    _subBlock = _block.subBlocks[positionRef.current.subBlockIndex];
+                    _elapsedTotal = _elapsedTotal + _secondsElapsed;
+                    _lastBeepSound = 0;
+                    _start = Date.now();
+                    setState(positionRef.current);
                 } else {
                     setIsRunning(false);
-                    clearTimeout(timer.current!);
+                    clearTimeout(timerRef.current!);
                 }
             }
         }, 100);
 
         return () => {
-            setIsRunning(false);
-            clearTimeout(timer.current!);
-            IdleTimerManager.setIdleTimerDisabled(false);
+            clearTimeout(timerRef.current!);
         }
-    }, [ workout ]);
+    }, [ workout, isPaused, setState ]);
+
+    // methods
+    const moveNextBlock = (_position: TimerPosition) => {
+        setIsPaused(true);
+        const _next = workout.findNextBlock(_position);
+        if (_next) {
+            setState(_next);
+            update();
+        }
+    }
+
+    const movePrevBlock = (_position: TimerPosition) => {
+        setIsPaused(true);
+        const _prev = workout.findPrevBlock(_position);
+        if (_prev) {
+            setState(_prev);
+            update();
+        }
+    }
+
+    const update = () => {
+        forceUpdate((_prev) => !_prev);
+    }
 
     // jsx
     return (
@@ -140,7 +171,7 @@ export default function TimerScreen() {
                         { workout.name }
                     </Text>
                     <Text style = { [ style.text, style.normal, style.bold, style.right ] } numberOfLines = { 1 }>
-                        { formatDuration(elapsedTime) + ' / ' + formatDuration(workout.totalDuration) }
+                        { formatDuration(elapsedTotalRef.current) + ' / ' + formatDuration(workout.totalDuration) }
                     </Text>
                 </View>
             </View>
@@ -154,19 +185,38 @@ export default function TimerScreen() {
                 </View>
             ) : (
                 <View style = { [ style.secondary, style.margin, style.padding, style.border, style.outlineThick, style.flex1 ] }>
-                    <View style = { [ style.tertiary, style.padding, style.border, style.outlineThick ] }>
-                        <Text style = { [ style.text, style.large, style.center ] } numberOfLines = { 1 }>
-                            Set {sets} / {block?.sets}
-                        </Text>
-                    </View>
-                    <View style = { [ { backgroundColor: subBlock?.color }, style.marginTop, style.padding, style.middle, style.border, style.outlineThick, style.flex1 ] }>
-                        <Text style = { [ style.text, style.xlarge, style.bold, style.center ] } numberOfLines = { 1 }>
-                            { formatDuration(timeLeft) }
-                        </Text>
-                    </View>
                     <View style = { [ style.tertiary, style.marginTop, style.padding, style.border, style.outlineThick ] }>
                         <Text style = { [ style.text, style.large, style.center ] } numberOfLines = { 1 }>
-                            { subBlock?.label }
+                            { workout.blocks[positionRef.current.blockIndex].subBlocks[positionRef.current.subBlockIndex].label }
+                        </Text>
+                        <View style = { [ style.row, style.marginTop, style.border ] }>
+                            <TouchableOpacity style = { [ style.quaternary, style.padding, style.button, (prevRef.current == null ?  style.disabled : {}), style.border, style.outline ] }
+                                disabled = { prevRef.current == null }
+                                onPress = { () => { movePrevBlock(positionRef.current!); }}
+                            >
+                                <MaterialIcons name = 'skip-previous' size = { theme.sizes.md }/>
+                            </TouchableOpacity>
+                            <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.padding, style.button, style.border, style.outline, style.flex1 ] }
+                                onPress = { () => { setIsPaused(!isPaused); }}
+                            >
+                                <MaterialIcons name = {isPaused ? 'play-arrow' : 'pause'} size = { theme.sizes.md }/>
+                            </TouchableOpacity>
+                            <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.padding, style.button, (nextRef.current == null ?  style.disabled : {}), style.border, style.outline ] }
+                                disabled = { nextRef.current == null }
+                                onPress = { () => { moveNextBlock(positionRef.current!); }}
+                            >
+                                <MaterialIcons name = 'skip-next' size = { theme.sizes.md }/>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    <View style = { [ { backgroundColor: workout.blocks[positionRef.current.blockIndex].subBlocks[positionRef.current.subBlockIndex].color }, style.middle, style.marginTop, style.border, style.outlineThick, style.flex1 ] }>
+                        <Text style = { [ style.text, style.xxlarge, style.bold, style.center ] } numberOfLines = { 1 }>
+                            { formatDuration(timeLeftRef.current) }
+                        </Text>
+                    </View>
+                    <View style = { [ style.tertiary, style.marginVertical, style.padding, style.border, style.outlineThick ] }>
+                        <Text style = { [ style.text, style.large, style.center ] } numberOfLines = { 1 }>
+                            Set {positionRef.current.set} / {workout.blocks[positionRef.current.blockIndex].sets}
                         </Text>
                     </View>
                 </View>

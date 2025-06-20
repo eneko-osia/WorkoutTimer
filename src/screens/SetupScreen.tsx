@@ -88,7 +88,7 @@ export default function SetupScreen() {
 
     const update = () => {
         setPendingChanges(true);
-        forceUpdate((prev) => !prev);
+        forceUpdate((_prev) => !_prev);
     }
 
     // jsx

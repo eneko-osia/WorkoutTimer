@@ -14,6 +14,12 @@ export type TimerBlock = {
     subBlocks: TimerSubBlock[];
 };
 
+export type TimerPosition = {
+    blockIndex: number;
+    subBlockIndex: number;
+    set: number;
+};
+
 export class Workout {
     static readonly kMinSets: number = 1;
     static readonly kMaxSets: number = 99;
@@ -97,6 +103,40 @@ export class Workout {
         if (block) {
             block.subBlocks = block.subBlocks.filter((sb) => sb.id !== subBlockId);
         }
+    }
+
+    findNextBlock(position: TimerPosition): TimerPosition | null {
+        const block = this.blocks[position.blockIndex];
+        if ((position.subBlockIndex + 1) < block.subBlocks.length) {
+            return { blockIndex: position.blockIndex, subBlockIndex: (position.subBlockIndex + 1), set: position.set };
+        } else if ((position.set + 1) <= block.sets) {
+            return { blockIndex: position.blockIndex, subBlockIndex: 0, set: (position.set + 1) };
+        } else if ((position.blockIndex + 1) < this.blocks.length) {
+            return { blockIndex: (position.blockIndex + 1), subBlockIndex: 0, set: 1 };
+        }
+        return null;
+    }
+
+    findPrevBlock(position: TimerPosition): TimerPosition | null {
+        const block = this.blocks[position.blockIndex];
+        if ((position.subBlockIndex - 1) >= 0) {
+            return { blockIndex: position.blockIndex, subBlockIndex: (position.subBlockIndex - 1), set: position.set };
+        } else if ((position.set - 1) >= 1) {
+            return { blockIndex: position.blockIndex, subBlockIndex: block.subBlocks.length - 1, set: (position.set - 1) };
+        } else if ((position.blockIndex - 1) >= 0) {
+            return { blockIndex: (position.blockIndex - 1), subBlockIndex: block.subBlocks.length - 1, set: block.sets };
+        }
+        return null;
+    }
+
+    getDuration(position: TimerPosition) : number {
+        return this.blocks.reduce((_total, _block, _i) => {
+            const _isCurrentBlock = (_i === position.blockIndex);
+            const _blockTotal = _block.subBlocks.reduce((_subTotal, _subBlock, _j) => {
+                return _subTotal + _subBlock.duration * ((!_isCurrentBlock) ? _block.sets : ((_j < position.subBlockIndex) ? position.set : (position.set - 1)));
+            }, 0);
+            return (_i <= position.blockIndex) ? (_total + _blockTotal) : _total;
+        }, 0);
     }
 
     static fromJSON(data: any): Workout {

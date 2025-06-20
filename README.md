@@ -77,7 +77,7 @@ npm run ios
 │ ├── theme/            # Theme and style definitions
 │ ├── utils/            # Utility functions
 ├── App.tsx             # Entry point
-├── MainApp.tsx         # Navigation container
+└── LICENSE
 └── README.md
 ```
 ---
