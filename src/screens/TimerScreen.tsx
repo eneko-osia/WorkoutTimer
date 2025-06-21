@@ -178,9 +178,7 @@ export default function TimerScreen() {
             {!isRunning ? (
                 <View style = { [ style.secondary, style.margin, style.padding, style.border, style.outlineThick, style.flex1 ] }>
                     <View style = { [ style.tertiary, style.padding, style.middle, style.border, style.outlineThick, style.flex1 ] }>
-                        <Text style = { [ style.text, style.xlarge, style.bold, style.center] }>
-                            Workout{'\n'}Completed
-                        </Text>
+                        <MaterialIcons name = 'done' size = { theme.sizes.xl }/>
                     </View>
                 </View>
             ) : (
