@@ -17,7 +17,7 @@ const common = {
         md:     moderateScale(16),
         lg:     moderateScale(32),
         xl:     moderateScale(64),
-        xxl:    moderateScale(128),
+        xxl:    moderateScale(96),
     },
     sizes: {
         xs:     scale(8),

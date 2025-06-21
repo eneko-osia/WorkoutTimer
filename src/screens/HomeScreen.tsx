@@ -54,13 +54,13 @@ export default function HomeScreen() {
             workout.createSubBlock(blockId, 'Prepare', 5);
         }
         {
-            const blockId: number = workout.createBlock();
+            const blockId: number = workout.createBlock(3);
             workout.createSubBlock(blockId, 'Work', 10);
             workout.createSubBlock(blockId, 'Rest', 10);
         }
         {
             const blockId: number = workout.createBlock();
-            workout.createSubBlock(blockId, 'Cooldown', 30);
+            workout.createSubBlock(blockId, 'Cooldown', 60);
         }
         return workout;
     }
