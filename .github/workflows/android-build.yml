@@ -8,7 +8,7 @@ on:
         type: string
     outputs:
       apk-name:
-        value: ${{ jobs.build.outputs.app-name }}
+        value: ${{ jobs.build.outputs.apk-name }}
       version:
         value: ${{ jobs.build.outputs.version }}
     secrets:

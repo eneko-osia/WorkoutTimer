@@ -2,6 +2,11 @@ name: Android Build [Release]
 
 on:
   workflow_call:
+    outputs:
+      apk-name:
+        value: ${{ jobs.build-release.outputs.apk-name }}
+      version:
+        value: ${{ jobs.build-release.outputs.version }}
     secrets:
       MYAPP_UPLOAD_STORE_BASE64:
         required: true
@@ -14,12 +19,6 @@ on:
       MYAPP_UPLOAD_KEY_PASSWORD:
         required: true
   workflow_dispatch:
-
-outputs:
-  apk-name:
-    value: ${{ jobs.build-release.outputs.apk-name }}
-  version:
-    value: ${{ jobs.build-release.outputs.version }}
 
 jobs:
   build-release:
