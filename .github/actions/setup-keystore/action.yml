@@ -1,17 +1,22 @@
 name: Setup Keystore
 description: Decodes the keystore file and configures gradle.properties for Android signing.
 
-secrets:
-  MYAPP_UPLOAD_STORE_BASE64:
+inputs:
+  upload-store-base64:
     required: true
-  MYAPP_UPLOAD_STORE_FILE:
+    type: string
+  upload-store-file:
     required: true
-  MYAPP_UPLOAD_STORE_PASSWORD:
+    type: string
+  upload-store-password:
     required: true
-  MYAPP_UPLOAD_KEY_ALIAS:
+    type: string
+  upload-key-alias:
     required: true
-  MYAPP_UPLOAD_KEY_PASSWORD:
+    type: string
+  upload-key-password:
     required: true
+    type: string
 
 runs:
   using: "composite"
@@ -19,10 +24,10 @@ runs:
     - name: Setup
       shell: bash
       run: |
-        echo "${{ secrets.MYAPP_UPLOAD_STORE_BASE64 }}" | base64 --decode > "android/app/${{ secrets.MYAPP_UPLOAD_STORE_FILE }}"
+        echo "${{ inputs.upload-store-base64 }}" | base64 --decode > "android/app/${{ inputs.upload-store-file }}"
 
         mkdir -p "$HOME/.gradle"
-        echo "MYAPP_UPLOAD_STORE_FILE=${{ secrets.MYAPP_UPLOAD_STORE_FILE }}" >> "$HOME/.gradle/gradle.properties"
-        echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.MYAPP_UPLOAD_STORE_PASSWORD }}" >> "$HOME/.gradle/gradle.properties"
-        echo "MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.MYAPP_UPLOAD_KEY_ALIAS }}" >> "$HOME/.gradle/gradle.properties"
-        echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.MYAPP_UPLOAD_KEY_PASSWORD }}" >> "$HOME/.gradle/gradle.properties"
+        echo "MYAPP_UPLOAD_STORE_FILE=${{ inputs.upload-store-file }}" >> "$HOME/.gradle/gradle.properties"
+        echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ inputs.upload-store-password }}" >> "$HOME/.gradle/gradle.properties"
+        echo "MYAPP_UPLOAD_KEY_ALIAS=${{ inputs.upload-key-alias }}" >> "$HOME/.gradle/gradle.properties"
+        echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ inputs.upload-key-password }}" >> "$HOME/.gradle/gradle.properties"
