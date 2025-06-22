@@ -1,0 +1,24 @@
+name: Setup Version
+description: Setup application version from Git tag and writes it to gradle.properties.
+
+outputs:
+  version:
+    description: "Version name"
+    value: ${{ steps.setup.outputs.version }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup
+      id: setup
+      shell: bash
+      run: |
+        TAG_NAME="${GITHUB_REF#refs/tags/}"
+        VERSION_NAME="${TAG_NAME#v}"
+        IFS='.' read -ra PARTS <<< "$VERSION_NAME"
+        VERSION_CODE=$(( ${PARTS[0]} * 1000000 + ${PARTS[1]} * 1000 + ${PARTS[2]} ))
+
+        mkdir -p "$HOME/.gradle"
+        echo "VERSION_CODE=$VERSION_CODE" >> "$HOME/.gradle/gradle.properties"
+        echo "VERSION_NAME=$VERSION_NAME" >> "$HOME/.gradle/gradle.properties"
+        echo "version=$VERSION_NAME" >> $GITHUB_OUTPUT

@@ -18,8 +18,22 @@ jobs:
       MYAPP_UPLOAD_KEY_ALIAS: ${{ secrets.MYAPP_UPLOAD_KEY_ALIAS }}
       MYAPP_UPLOAD_KEY_PASSWORD: ${{ secrets.MYAPP_UPLOAD_KEY_PASSWORD }}
 
-  release:
+  setup-version:
     needs: build-release
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.setup-version.outputs.version }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup version
+        id: setup-version
+        uses: ./.github/actions/setup-version
+
+  release:
+    needs: [build-release, setup-version]
     runs-on: ubuntu-24.04
 
     steps:
@@ -28,14 +42,10 @@ jobs:
         with:
           name: ${{ needs.build-release.outputs.apk-name }}
 
-      - name: Extract version
-        id: extract-version
-        uses: ./.github/actions/extract-version
-
       - name: Rename APK
         run: |
           APK_OLD_NAME="${{ needs.build-release.outputs.apk-name }}"
-          APK_NEW_NAME="com.joganera.workouttimer-${{ steps.extract-version.outputs.version }}"
+          APK_NEW_NAME="com.joganera.workouttimer-${{ needs.setup-version.outputs.version }}"
           mv "$APK_OLD_NAME.apk" "$APK_NEW_NAME.apk"
           echo "APK_NAME=$APK_NEW_NAME" >> $GITHUB_ENV
 
