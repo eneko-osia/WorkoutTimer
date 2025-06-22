@@ -21,5 +21,5 @@ runs:
       shell: bash
       run: |
         SHORT_SHA=$(git rev-parse --short HEAD)
-        APK_NAME=com.joganera.workouttimer-${{ inputs.build-type }}-${{ inputs.version }}-${SHORT_SHA}
+        APK_NAME="com.joganera.workouttimer-${{ inputs.build-type }}-${{ inputs.version }}-${SHORT_SHA}"
         echo "app-name=$APK_NAME" >> $GITHUB_OUTPUT
