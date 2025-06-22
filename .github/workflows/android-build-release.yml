@@ -2,6 +2,9 @@ name: Android Build [Release]
 
 on:
   workflow_call:
+    outputs:
+      apk-name:
+        value: ${{ jobs.build-release.outputs.apk-name }}
     secrets:
       MYAPP_UPLOAD_STORE_BASE64:
         required: true

@@ -28,11 +28,15 @@ jobs:
         with:
           name: ${{ needs.build-release.outputs.apk-name }}
 
+      - name: Extract version
+        id: extract-version
+        uses: ./.github/actions/extract-version
+
       - name: Rename APK
         run: |
-          APK_OLD_NAME="${{ needs.build-release.outputs.apk-name }}.apk"
-          APK_NEW_NAME="com.joganera.workouttimer-${{ needs.build-release.outputs.version }}.apk"
-          mv "$APK_OLD_NAME" "$APK_NEW_NAME"
+          APK_OLD_NAME="${{ needs.build-release.outputs.apk-name }}"
+          APK_NEW_NAME="com.joganera.workouttimer-${{ steps.extract-version.outputs.version }}"
+          mv "$APK_OLD_NAME.apk" "$APK_NEW_NAME.apk"
           echo "APK_NAME=$APK_NEW_NAME" >> $GITHUB_ENV
 
       - name: Create GitHub release
