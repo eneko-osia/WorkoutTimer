@@ -14,7 +14,7 @@ on:
         type: string
     outputs:
       apk-name:
-        value: ${{ steps.generate-apk-name.outputs.apk-name }}
+        value: ${{ jobs.manage-apk.outputs.apk-name }}
 
 jobs:
   manage-apk:
