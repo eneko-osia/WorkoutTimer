@@ -26,12 +26,19 @@ jobs:
       - name: Download APK
         uses: actions/download-artifact@v4
         with:
-          name: workout-timer-release-apk
+          name: ${{ needs.build-release.outputs.apk-name }}
+
+      - name: Rename APK
+        run: |
+          APK_OLD_NAME="${{ needs.build-release.outputs.apk-name }}.apk"
+          APK_NEW_NAME="com.joganera.workouttimer-${{ needs.build-release.outputs.version }}.apk"
+          mv "$APK_OLD_NAME" "$APK_NEW_NAME"
+          echo "APK_NAME=$APK_NEW_NAME" >> $GITHUB_ENV
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          files: app-release.apk
+          files: ${{ env.APK_NAME }}.apk
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
