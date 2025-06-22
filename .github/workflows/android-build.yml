@@ -66,12 +66,12 @@ jobs:
     - name: Setup keystore
       if: ${{ inputs.build-type == 'release' }}
       uses: ./.github/actions/setup-keystore
-      secrets:
-        MYAPP_UPLOAD_STORE_BASE64: ${{ secrets.MYAPP_UPLOAD_STORE_BASE64 }}
-        MYAPP_UPLOAD_STORE_FILE: ${{ secrets.MYAPP_UPLOAD_STORE_FILE }}
-        MYAPP_UPLOAD_STORE_PASSWORD: ${{ secrets.MYAPP_UPLOAD_STORE_PASSWORD }}
-        MYAPP_UPLOAD_KEY_ALIAS: ${{ secrets.MYAPP_UPLOAD_KEY_ALIAS }}
-        MYAPP_UPLOAD_KEY_PASSWORD: ${{ secrets.MYAPP_UPLOAD_KEY_PASSWORD }}
+      with:
+        upload-store-base64: ${{ secrets.MYAPP_UPLOAD_STORE_BASE64 }}
+        upload-store-file: ${{ secrets.MYAPP_UPLOAD_STORE_FILE }}
+        upload-store-password: ${{ secrets.MYAPP_UPLOAD_STORE_PASSWORD }}
+        upload-key-alias: ${{ secrets.MYAPP_UPLOAD_KEY_ALIAS }}
+        upload-key-password: ${{ secrets.MYAPP_UPLOAD_KEY_PASSWORD }}
 
     - name: Extract version
       id: extract-version
@@ -88,7 +88,7 @@ jobs:
     - name: Generate APK name
       id: generate-apk-name
       uses: ./.github/actions/generate-app-name
-      with: 
+      with:
         build-type: ${{ inputs.build-type }}
         version: ${{ steps.extract-version.outputs.version }}
 
