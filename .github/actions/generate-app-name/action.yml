@@ -1,0 +1,25 @@
+name: Generate App Name
+description: Generates application name based on build type, version and commit hash.
+
+inputs:
+  build-type:
+    required: true
+    type: string
+  version:
+    required: true
+    type: string
+outputs:
+  app-name:
+    description: "Application name"
+    value: ${{ steps.generate.outputs.app-name }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Generate
+      id: generate
+      shell: bash
+      run: |
+        SHORT_SHA=$(git rev-parse --short HEAD)
+        APK_NAME=com.joganera.workouttimer-${{ inputs.build-type }}-${{ inputs.version }}-${SHORT_SHA}
+        echo "app-name=$APK_NAME" >> $GITHUB_OUTPUT
