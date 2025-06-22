@@ -1,0 +1,33 @@
+name: Setup Keystore
+description: Decodes the keystore file and configures gradle.properties for Android signing.
+
+inputs:
+  upload-store-base64:
+    required: true
+    type: string
+  upload-store-file:
+    required: true
+    type: string
+  upload-store-password:
+    required: true
+    type: string
+  upload-key-alias:
+    required: true
+    type: string
+  upload-key-password:
+    required: true
+    type: string
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup
+      shell: bash
+      run: |
+        echo "${{ inputs.upload-store-base64 }}" | base64 --decode > "android/app/${{ inputs.upload-store-file }}"
+
+        mkdir -p "$HOME/.gradle"
+        echo "MYAPP_UPLOAD_STORE_FILE=${{ inputs.upload-store-file }}" >> "$HOME/.gradle/gradle.properties"
+        echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ inputs.upload-store-password }}" >> "$HOME/.gradle/gradle.properties"
+        echo "MYAPP_UPLOAD_KEY_ALIAS=${{ inputs.upload-key-alias }}" >> "$HOME/.gradle/gradle.properties"
+        echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ inputs.upload-key-password }}" >> "$HOME/.gradle/gradle.properties"

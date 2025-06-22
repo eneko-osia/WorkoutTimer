@@ -4,16 +4,15 @@ on:
   workflow_call:
     secrets:
       MYAPP_UPLOAD_STORE_BASE64:
-        required: false
+        required: true
       MYAPP_UPLOAD_STORE_FILE:
-        required: false
+        required: true
       MYAPP_UPLOAD_STORE_PASSWORD:
-        required: false
+        required: true
       MYAPP_UPLOAD_KEY_ALIAS:
-        required: false
+        required: true
       MYAPP_UPLOAD_KEY_PASSWORD:
-        required: false
-
+        required: true
   workflow_dispatch:
 
 jobs:

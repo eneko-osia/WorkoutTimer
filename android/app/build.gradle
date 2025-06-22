@@ -77,13 +77,13 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.joganera.workouttimer"
+    namespace 'com.joganera.workouttimer'
     defaultConfig {
-        applicationId "com.joganera.workouttimer"
+        applicationId 'com.joganera.workouttimer'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode project.hasProperty('VERSION_CODE') ? VERSION_CODE.toInteger() : 1
+        versionName project.hasProperty('VERSION_NAME') ? VERSION_NAME : '0.0.1'
     }
     signingConfigs {
         debug {

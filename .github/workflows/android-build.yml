@@ -6,6 +6,11 @@ on:
       build-type:
         required: true
         type: string
+    outputs:
+      apk-name:
+        value: ${{ jobs.build.outputs.app-name }}
+      version:
+        value: ${{ jobs.build.outputs.version }}
     secrets:
       MYAPP_UPLOAD_STORE_BASE64:
         required: false
@@ -21,6 +26,9 @@ on:
 jobs:
   build:
     runs-on: ${{matrix.os}}
+    outputs:
+      apk-name: ${{ steps.generate-apk-name.outputs.app-name }}
+      version: ${{ steps.extract-version.outputs.version }}
     strategy:
       matrix:
         os: [ ubuntu-24.04 ]
@@ -58,33 +66,42 @@ jobs:
         restore-keys: |
             ${{ runner.os }}-gradle-
 
-    - name: Decode keystore
+    - name: Setup keystore
       if: ${{ inputs.build-type == 'release' }}
-      run: echo "${{ secrets.MYAPP_UPLOAD_STORE_BASE64 }}" | base64 --decode > android/app/${{ secrets.MYAPP_UPLOAD_STORE_FILE }}
+      uses: ./.github/actions/setup-keystore
+      with:
+        upload-store-base64: ${{ secrets.MYAPP_UPLOAD_STORE_BASE64 }}
+        upload-store-file: ${{ secrets.MYAPP_UPLOAD_STORE_FILE }}
+        upload-store-password: ${{ secrets.MYAPP_UPLOAD_STORE_PASSWORD }}
+        upload-key-alias: ${{ secrets.MYAPP_UPLOAD_KEY_ALIAS }}
+        upload-key-password: ${{ secrets.MYAPP_UPLOAD_KEY_PASSWORD }}
 
-    - name: Create gradle.properties
-      if: ${{ inputs.build-type == 'release' }}
-      run: |
-        mkdir -p $HOME/.gradle
-        cat <<EOF > $HOME/.gradle/gradle.properties
-        MYAPP_UPLOAD_STORE_FILE=${{ secrets.MYAPP_UPLOAD_STORE_FILE }}
-        MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.MYAPP_UPLOAD_KEY_ALIAS }}
-        MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.MYAPP_UPLOAD_STORE_PASSWORD }}
-        MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.MYAPP_UPLOAD_KEY_PASSWORD }}
-        EOF
+    - name: Extract version
+      id: extract-version
+      uses: ./.github/actions/extract-version
 
-    - name: Generate Codegen
+    - name: Generate codegen
       working-directory: android
       run: ./gradlew generateCodegenArtifactsFromSchema
 
-    - name: Build
+    - name: Build APK
       working-directory: android
       run: ./gradlew assemble${{ inputs.build-type == 'release' && 'Release' || 'Debug' }}
 
-    - name: Upload
-      if: startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/tags/')
+    - name: Generate APK name
+      id: generate-apk-name
+      uses: ./.github/actions/generate-app-name
+      with:
+        build-type: ${{ inputs.build-type }}
+        version: ${{ steps.extract-version.outputs.version }}
+
+    - name: Rename APK
+      run: |
+        mv android/app/build/outputs/apk/${{ inputs.build-type }}/app-${{ inputs.build-type }}.apk android/app/build/outputs/apk/${{ inputs.build-type }}/${{ steps.generate-apk-name.outputs.app-name }}.apk
+
+    - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: workout-timer-${{ inputs.build-type }}-apk
-        path: android/app/build/outputs/apk/${{ inputs.build-type }}/app-${{ inputs.build-type }}.apk
-        retention-days: 7
+        name: ${{ steps.generate-apk-name.outputs.app-name }}
+        path: android/app/build/outputs/apk/${{ inputs.build-type }}/${{ steps.generate-apk-name.outputs.app-name }}.apk
+        retention-days: 3
