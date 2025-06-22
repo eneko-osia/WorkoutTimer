@@ -9,8 +9,6 @@ on:
     outputs:
       apk-name:
         value: ${{ jobs.build.outputs.apk-name }}
-      version:
-        value: ${{ jobs.build.outputs.version }}
     secrets:
       MYAPP_UPLOAD_STORE_BASE64:
         required: false
@@ -28,7 +26,6 @@ jobs:
     runs-on: ${{matrix.os}}
     outputs:
       apk-name: ${{ steps.generate-apk-name.outputs.app-name }}
-      version: ${{ steps.extract-version.outputs.version }}
     strategy:
       matrix:
         os: [ ubuntu-24.04 ]
@@ -76,10 +73,6 @@ jobs:
         upload-key-alias: ${{ secrets.MYAPP_UPLOAD_KEY_ALIAS }}
         upload-key-password: ${{ secrets.MYAPP_UPLOAD_KEY_PASSWORD }}
 
-    - name: Extract version
-      id: extract-version
-      uses: ./.github/actions/extract-version
-
     - name: Generate codegen
       working-directory: android
       run: ./gradlew generateCodegenArtifactsFromSchema
@@ -93,7 +86,6 @@ jobs:
       uses: ./.github/actions/generate-app-name
       with:
         build-type: ${{ inputs.build-type }}
-        version: ${{ steps.extract-version.outputs.version }}
 
     - name: Rename APK
       run: |

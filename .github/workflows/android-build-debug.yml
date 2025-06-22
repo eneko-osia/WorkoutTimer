@@ -2,6 +2,9 @@ name: Android Build [Debug]
 
 on:
   workflow_call:
+    outputs:
+      apk-name:
+        value: ${{ jobs.build-debug.outputs.apk-name }}
   workflow_dispatch:
 
 jobs:

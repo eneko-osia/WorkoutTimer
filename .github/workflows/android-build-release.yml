@@ -5,8 +5,6 @@ on:
     outputs:
       apk-name:
         value: ${{ jobs.build-release.outputs.apk-name }}
-      version:
-        value: ${{ jobs.build-release.outputs.version }}
     secrets:
       MYAPP_UPLOAD_STORE_BASE64:
         required: true
