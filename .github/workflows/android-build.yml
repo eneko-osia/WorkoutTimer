@@ -34,7 +34,6 @@ jobs:
     needs: setup-environment
     uses: ./.github/workflows/setup-keystore.yml
     with:
-      build-type: ${{ inputs.build-type }}
       os: 'ubuntu-24.04'
     secrets:
       MYAPP_UPLOAD_STORE_BASE64: ${{ secrets.MYAPP_UPLOAD_STORE_BASE64 }}
