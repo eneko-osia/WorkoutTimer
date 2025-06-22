@@ -63,18 +63,15 @@ jobs:
         restore-keys: |
             ${{ runner.os }}-gradle-
 
-    - name: Decode keystore
+    - name: Setup keystore
       if: ${{ inputs.build-type == 'release' }}
-      run: echo "${{ secrets.MYAPP_UPLOAD_STORE_BASE64 }}" | base64 --decode > "android/app/${{ secrets.MYAPP_UPLOAD_STORE_FILE }}"
-
-    - name: Set keystore
-      if: ${{ inputs.build-type == 'release' }}
-      run: |
-        mkdir -p "$HOME/.gradle"
-        echo "MYAPP_UPLOAD_STORE_FILE=${{ secrets.MYAPP_UPLOAD_STORE_FILE }}" >> "$HOME/.gradle/gradle.properties"
-        echo "MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.MYAPP_UPLOAD_KEY_ALIAS }}" >> "$HOME/.gradle/gradle.properties"
-        echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.MYAPP_UPLOAD_STORE_PASSWORD }}" >> "$HOME/.gradle/gradle.properties"
-        echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.MYAPP_UPLOAD_KEY_PASSWORD }}" >> "$HOME/.gradle/gradle.properties"
+      uses: ./.github/actions/setup-keystore
+      secrets:
+        MYAPP_UPLOAD_STORE_BASE64: ${{ secrets.MYAPP_UPLOAD_STORE_BASE64 }}
+        MYAPP_UPLOAD_STORE_FILE: ${{ secrets.MYAPP_UPLOAD_STORE_FILE }}
+        MYAPP_UPLOAD_STORE_PASSWORD: ${{ secrets.MYAPP_UPLOAD_STORE_PASSWORD }}
+        MYAPP_UPLOAD_KEY_ALIAS: ${{ secrets.MYAPP_UPLOAD_KEY_ALIAS }}
+        MYAPP_UPLOAD_KEY_PASSWORD: ${{ secrets.MYAPP_UPLOAD_KEY_PASSWORD }}
 
     - name: Extract version
       id: extract-version
@@ -90,19 +87,18 @@ jobs:
 
     - name: Generate APK name
       id: generate-apk-name
-      run: |
-        SHORT_SHA=$(git rev-parse --short HEAD)
-        APK_NAME=com.joganera.workouttimer-${{ inputs.build-type }}-${{ steps.extract-version.outputs.version }}-${SHORT_SHA}
-        echo "APK_NAME=$APK_NAME" >> $GITHUB_ENV
-        echo "apk-name=$APK_NAME" >> $GITHUB_OUTPUT
+      uses: ./.github/actions/generate-app-name
+      with: 
+        build-type: ${{ inputs.build-type }}
+        version: ${{ steps.extract-version.outputs.version }}
 
     - name: Rename APK
       run: |
-        mv android/app/build/outputs/apk/${{ inputs.build-type }}/app-${{ inputs.build-type }}.apk android/app/build/outputs/apk/${{ inputs.build-type }}/${{ env.APK_NAME }}.apk
+        mv android/app/build/outputs/apk/${{ inputs.build-type }}/app-${{ inputs.build-type }}.apk android/app/build/outputs/apk/${{ inputs.build-type }}/${{ steps.generate-apk-name.outputs.app-name }}.apk
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.APK_NAME }}
-        path: android/app/build/outputs/apk/${{ inputs.build-type }}/${{ env.APK_NAME }}.apk
+        name: ${{ steps.generate-apk-name.outputs.app-name }}
+        path: android/app/build/outputs/apk/${{ inputs.build-type }}/${{ steps.generate-apk-name.outputs.app-name }}.apk
         retention-days: 3
