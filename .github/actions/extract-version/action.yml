@@ -1,9 +1,17 @@
 name: Extract Version
 description: Extracts version from Git tag and writes it to gradle.properties.
+
+outputs:
+  version:
+    description: "Parsed version"
+    value: ${{ steps.extract.outputs.version }}
+
 runs:
   using: "composite"
   steps:
-    - shell: bash
+    - name: Extract
+      id: extract
+      shell: bash
       run: |
         if [[ "$GITHUB_REF" == refs/tags/* ]]; then
           TAG_NAME="${GITHUB_REF#refs/tags/}"
@@ -19,7 +27,3 @@ runs:
         echo "VERSION_CODE=$VERSION_CODE" >> "$HOME/.gradle/gradle.properties"
         echo "VERSION_NAME=$VERSION_NAME" >> "$HOME/.gradle/gradle.properties"
         echo "version=$VERSION_NAME" >> $GITHUB_OUTPUT
-
-outputs:
-  version:
-    description: "Parsed version"
