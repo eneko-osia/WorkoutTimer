@@ -24,7 +24,7 @@ on:
 
 jobs:
   setup-environment:
-    uses: ./.github/workflows/reusable/setup-environment.yml
+    uses: ./.github/workflows/setup-environment.yml
     with:
       node-version: '23'
       os: 'ubuntu-24.04'
@@ -32,7 +32,7 @@ jobs:
   setup-keystore:
     if: ${{ inputs.build-type == 'release' }}
     needs: setup-environment
-    uses: ./.github/workflows/reusable/setup-keystore.yml
+    uses: ./.github/workflows/setup-keystore.yml
     with:
       build-type: ${{ inputs.build-type }}
       os: 'ubuntu-24.04'
@@ -45,13 +45,13 @@ jobs:
 
   extract-version:
     needs: setup-keystore
-    uses: ./.github/workflows/reusable/extract-version.yml
+    uses: ./.github/workflows/extract-version.yml
     with:
       os: 'ubuntu-24.04'
 
   build-android:
     needs: extract-version
-    uses: ./.github/workflows/reusable/build-android.yml
+    uses: ./.github/workflows/build-android.yml
     with:
       build-type: ${{ inputs.build-type }}
       os: 'ubuntu-24.04'
