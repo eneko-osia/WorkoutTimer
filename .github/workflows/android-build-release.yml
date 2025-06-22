@@ -15,6 +15,12 @@ on:
         required: true
   workflow_dispatch:
 
+outputs:
+  apk-name:
+    value: ${{ jobs.build-release.outputs.apk-name }}
+  version:
+    value: ${{ jobs.build-release.outputs.version }}
+
 jobs:
   build-release:
     uses: ./.github/workflows/android-build.yml
