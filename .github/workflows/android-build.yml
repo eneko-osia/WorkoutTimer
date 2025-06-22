@@ -7,9 +7,8 @@ on:
         required: true
         type: string
     outputs:
-      apk_name:
-        description: "Name of the generated APK"
-        value: ${{ jobs.build.outputs.apk_name }}
+      apk-name:
+        value: ${{ jobs.build-android.outputs.apk-name }}
     secrets:
       MYAPP_UPLOAD_STORE_BASE64:
         required: false
@@ -23,42 +22,104 @@ on:
         required: false
 
 jobs:
-  setup-environment:
-    uses: ./.github/workflows/setup-environment.yml
-    with:
-      node-version: '23'
-      os: 'ubuntu-24.04'
-  
-  setup-keystore:
-    if: ${{ inputs.build-type == 'release' }}
-    needs: setup-environment
-    uses: ./.github/workflows/setup-keystore.yml
-    with:
-      os: 'ubuntu-24.04'
-    secrets:
-      MYAPP_UPLOAD_STORE_BASE64: ${{ secrets.MYAPP_UPLOAD_STORE_BASE64 }}
-      MYAPP_UPLOAD_STORE_FILE: ${{ secrets.MYAPP_UPLOAD_STORE_FILE }}
-      MYAPP_UPLOAD_STORE_PASSWORD: ${{ secrets.MYAPP_UPLOAD_STORE_PASSWORD }}
-      MYAPP_UPLOAD_KEY_ALIAS: ${{ secrets.MYAPP_UPLOAD_KEY_ALIAS }}
-      MYAPP_UPLOAD_KEY_PASSWORD: ${{ secrets.MYAPP_UPLOAD_KEY_PASSWORD }}
-
-  extract-version:
-    needs: setup-keystore
-    uses: ./.github/workflows/extract-version.yml
-    with:
-      os: 'ubuntu-24.04'
-
   build-android:
-    needs: extract-version
-    uses: ./.github/workflows/build-android.yml
-    with:
-      build-type: ${{ inputs.build-type }}
-      os: 'ubuntu-24.04'
+    runs-on: ${{matrix.os}}
+    outputs:
+      apk-name: ${{ steps.generate-apk-name.outputs.apk-name }}
+    strategy:
+      matrix:
+        os: [ ubuntu-24.04 ]
+        node-version: [ '23' ]
+      fail-fast: false
 
-  apk-management:
-    needs: build-android
-    uses: ./.github/workflows/apk-management.yml
-    with:
-      build-type: ${{ inputs.build-type }}
-      os: 'ubuntu-24.04'
-      version: ${{ needs.extract-version.outputs.version }}
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run Lint
+      run: npm run lint
+
+    - name: Cache Gradle
+      uses: actions/cache@v4
+      with:
+        path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+            ${{ runner.os }}-gradle-
+
+    - name: Decode keystore
+      if: ${{ inputs.build-type == 'release' }}
+      run: echo "${{ secrets.MYAPP_UPLOAD_STORE_BASE64 }}" | base64 --decode > "android/app/${{ secrets.MYAPP_UPLOAD_STORE_FILE }}"
+
+    - name: Create gradle.properties
+      if: ${{ inputs.build-type == 'release' }}
+      run: |
+        mkdir -p "$HOME/.gradle"
+        echo "MYAPP_UPLOAD_STORE_FILE=${{ secrets.MYAPP_UPLOAD_STORE_FILE }}" >> "$HOME/.gradle/gradle.properties"
+        echo "MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.MYAPP_UPLOAD_KEY_ALIAS }}" >> "$HOME/.gradle/gradle.properties"
+        echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.MYAPP_UPLOAD_STORE_PASSWORD }}" >> "$HOME/.gradle/gradle.properties"
+        echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.MYAPP_UPLOAD_KEY_PASSWORD }}" >> "$HOME/.gradle/gradle.properties"
+
+    - name: Extract version
+      run: |
+        if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          VERSION_NAME="${TAG_NAME#v}"
+          IFS='.' read -ra PARTS <<< "$VERSION_NAME"
+          VERSION_CODE=$(( ${PARTS[0]} * 1000000 + ${PARTS[1]} * 1000 + ${PARTS[2]} ))
+        else
+          VERSION_CODE=1
+          VERSION_NAME="0.0.1"
+        fi
+        mkdir -p "$HOME/.gradle"
+        echo "VERSION_CODE=$VERSION_CODE" >> "$HOME/.gradle/gradle.properties"
+        echo "VERSION_NAME=$VERSION_NAME" >> "$HOME/.gradle/gradle.properties"
+        echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
+
+    - name: Generate codegen
+      working-directory: android
+      run: ./gradlew generateCodegenArtifactsFromSchema
+
+    - name: Build APK
+      working-directory: android
+      run: ./gradlew assemble${{ inputs.build-type == 'release' && 'Release' || 'Debug' }}
+
+    - name: Generate APK name
+      id: generate-apk-name
+      run: |
+        if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+          APK_NAME=workout-timer-${{ env.VERSION_NAME }}
+        else
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          BUILD_DATE=$(date +%d%m%Y)
+          APK_NAME=workout-timer-${{ env.VERSION_NAME }}-${SHORT_SHA}-${BUILD_DATE}
+        fi
+        echo "APK_NAME=$APK_NAME" >> $GITHUB_ENV
+        echo "apk-name=$APK_NAME" >> $GITHUB_OUTPUT
+
+    - name: Rename APK
+      run: |
+        mv android/app/build/outputs/apk/${{ inputs.build-type }}/app-${{ inputs.build-type }}.apk android/app/build/outputs/apk/${{ inputs.build-type }}/${{ env.APK_NAME }}.apk
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.APK_NAME }}
+        path: android/app/build/outputs/apk/${{ inputs.build-type }}/${{ env.APK_NAME }}.apk
+        retention-days: 3
