@@ -28,7 +28,7 @@ jobs:
         with:
           name: workout-timer-release-apk
 
-      - name: Create GitHub Release
+      - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
           files: app-release.apk

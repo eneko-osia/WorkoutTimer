@@ -73,7 +73,23 @@ jobs:
         MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.MYAPP_UPLOAD_KEY_PASSWORD }}
         EOF
 
-    - name: Generate Codegen
+    - name: Extract version
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        TAG_NAME="${GITHUB_REF#refs/tags/}"
+        echo "TAG_NAME=${TAG_NAME}"
+        VERSION_NAME="${TAG_NAME#v}"
+        echo "VERSION_NAME=${VERSION_NAME}"
+        IFS='.' read -ra PARTS <<< "$VERSION_NAME"
+        VERSION_CODE=$(( ${PARTS[0]} * 1000000 + ${PARTS[1]} * 1000 + ${PARTS[2]} ))
+        echo "VERSION_CODE=${VERSION_CODE}"
+        mkdir -p $HOME/.gradle
+        {
+          echo "VERSION_NAME=${VERSION_NAME}"
+          echo "VERSION_CODE=${VERSION_CODE}"
+        } >> $HOME/.gradle/gradle.properties
+
+    - name: Generate codegen
       working-directory: android
       run: ./gradlew generateCodegenArtifactsFromSchema
 
