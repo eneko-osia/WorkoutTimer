@@ -8,7 +8,7 @@ on:
         type: string
     outputs:
       apk-name:
-        value: ${{ jobs.build-android.outputs.apk-name }}
+        value: ${{ jobs.build.outputs.apk-name }}
     secrets:
       MYAPP_UPLOAD_STORE_BASE64:
         required: false
@@ -22,7 +22,7 @@ on:
         required: false
 
 jobs:
-  build-android:
+  build:
     runs-on: ${{matrix.os}}
     outputs:
       apk-name: ${{ steps.generate-apk-name.outputs.apk-name }}
@@ -67,7 +67,7 @@ jobs:
       if: ${{ inputs.build-type == 'release' }}
       run: echo "${{ secrets.MYAPP_UPLOAD_STORE_BASE64 }}" | base64 --decode > "android/app/${{ secrets.MYAPP_UPLOAD_STORE_FILE }}"
 
-    - name: Create gradle.properties
+    - name: Set keystore
       if: ${{ inputs.build-type == 'release' }}
       run: |
         mkdir -p "$HOME/.gradle"
@@ -77,20 +77,8 @@ jobs:
         echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.MYAPP_UPLOAD_KEY_PASSWORD }}" >> "$HOME/.gradle/gradle.properties"
 
     - name: Extract version
-      run: |
-        if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-          TAG_NAME="${GITHUB_REF#refs/tags/}"
-          VERSION_NAME="${TAG_NAME#v}"
-          IFS='.' read -ra PARTS <<< "$VERSION_NAME"
-          VERSION_CODE=$(( ${PARTS[0]} * 1000000 + ${PARTS[1]} * 1000 + ${PARTS[2]} ))
-        else
-          VERSION_CODE=1
-          VERSION_NAME="0.0.1"
-        fi
-        mkdir -p "$HOME/.gradle"
-        echo "VERSION_CODE=$VERSION_CODE" >> "$HOME/.gradle/gradle.properties"
-        echo "VERSION_NAME=$VERSION_NAME" >> "$HOME/.gradle/gradle.properties"
-        echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
+      id: extract-version
+      uses: ./.github/actions/extract-version
 
     - name: Generate codegen
       working-directory: android
@@ -103,13 +91,8 @@ jobs:
     - name: Generate APK name
       id: generate-apk-name
       run: |
-        if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-          APK_NAME=workout-timer-${{ env.VERSION_NAME }}
-        else
-          SHORT_SHA=$(git rev-parse --short HEAD)
-          BUILD_DATE=$(date +%d%m%Y)
-          APK_NAME=workout-timer-${{ env.VERSION_NAME }}-${SHORT_SHA}-${BUILD_DATE}
-        fi
+        SHORT_SHA=$(git rev-parse --short HEAD)
+        APK_NAME=com.joganera.workouttimer-${{ inputs.build-type }}-${{ steps.extract-version.outputs.version }}-${SHORT_SHA}
         echo "APK_NAME=$APK_NAME" >> $GITHUB_ENV
         echo "apk-name=$APK_NAME" >> $GITHUB_OUTPUT
 
