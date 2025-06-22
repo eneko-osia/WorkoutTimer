@@ -1,0 +1,44 @@
+name: APK Management
+
+on:
+  workflow_call:
+    inputs:
+      build-type:
+        required: true
+        type: string
+      os:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+    outputs:
+      apk-name:
+        value: ${{ steps.generate-apk-name.outputs.apk-name }}
+
+jobs:
+  manage-apk:
+    runs-on: ${{ inputs.os }}
+    outputs:
+      apk-name: ${{ steps.generate-apk-name.outputs.apk-name }}
+
+    steps:
+    - name: Generate APK name
+      id: generate-apk-name
+      run: |
+        SHORT_SHA=$(git rev-parse --short HEAD)
+        BUILD_DATE=$(date +%d%m%Y)
+        APK_NAME=workout-timer-${{ inputs.version }}-${SHORT_SHA}-${BUILD_DATE}
+        echo "APK_NAME=$APK_NAME" >> $GITHUB_ENV
+        echo "apk-name=$APK_NAME" >> $GITHUB_OUTPUT
+
+    - name: Rename APK
+      run: |
+        mv android/app/build/outputs/apk/${{ inputs.build-type }}/app-${{ inputs.build-type }}.apk android/app/build/outputs/apk/${{ inputs.build-type }}/${{ env.APK_NAME }}.apk
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.APK_NAME }}
+        path: android/app/build/outputs/apk/${{ inputs.build-type }}/${{ env.APK_NAME }}.apk
+        retention-days: 3
