@@ -13,7 +13,6 @@ on:
         required: true
       MYAPP_UPLOAD_KEY_PASSWORD:
         required: true
-
   workflow_dispatch:
 
 jobs:
