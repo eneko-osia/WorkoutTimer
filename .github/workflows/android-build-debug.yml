@@ -5,7 +5,29 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-debug:
-    uses: ./.github/workflows/android-build.yml
+  setup-environment:
+    uses: ./.github/workflows/setup-environment.yml
     with:
-      build-type: debug
+      node-version: '23'
+      os: 'ubuntu-24.04'
+
+  extract-version:
+    needs: setup-environment
+    uses: ./.github/workflows/extract-version.yml
+    with:
+      os: 'ubuntu-24.04'
+
+  build-android:
+    needs: extract-version
+    uses: ./.github/workflows/build-android.yml
+    with:
+      build-type: 'debug'
+      os: 'ubuntu-24.04'
+
+  apk-management:
+    needs: build-android
+    uses: ./.github/workflows/apk-management.yml
+    with:
+      build-type: 'debug'
+      os: 'ubuntu-24.04'
+      version: ${{ needs.extract-version.outputs.version }}
