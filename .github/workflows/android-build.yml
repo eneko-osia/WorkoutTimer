@@ -79,7 +79,7 @@ jobs:
 
     - name: Build APK
       working-directory: android
-      run: ./gradlew assemble${{ inputs.build-type == 'release' && 'Release' || 'Debug' }}
+      run: ./gradlew assemble${{ inputs.build-type == 'release' && 'Release' || 'Debug' }} -PreactNativeArchitectures=armeabi-v7a,arm64-v8a
 
     - name: Generate APK name
       id: generate-apk-name
