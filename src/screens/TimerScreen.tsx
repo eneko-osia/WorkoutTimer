@@ -176,13 +176,13 @@ export default function TimerScreen() {
                 </View>
             </View>
             {!isRunning ? (
-                <View style = { [ style.secondary, style.margin, style.padding, style.border, style.outlineThick, style.flex1 ] }>
+                <View style = { [ style.containerSecondary, style.flex1 ] }>
                     <View style = { [ style.tertiary, style.padding, style.middle, style.border, style.outlineThick, style.flex1 ] }>
                         <MaterialIcons name = 'done' size = { theme.sizes.xl }/>
                     </View>
                 </View>
             ) : (
-                <View style = { [ style.secondary, style.margin, style.padding, style.border, style.outlineThick, style.flex1 ] }>
+                <View style = { [ style.containerSecondary, style.flex1 ] }>
                     <View style = { [ style.tertiary, style.marginTop, style.padding, style.border, style.outlineThick ] }>
                         <Text style = { [ style.text, style.large, style.center ] } numberOfLines = { 1 }>
                             { workout.blocks[positionRef.current.blockIndex].subBlocks[positionRef.current.subBlockIndex].label }

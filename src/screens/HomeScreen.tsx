@@ -109,7 +109,7 @@ export default function HomeScreen() {
             {workouts.length === 0 ? (
                 <></>
             ) : (
-                <View style = { [ style.secondary, style.margin, style.padding, style.border, style.outlineThick, style.flex1 ] }>
+                <View style = { [ style.containerSecondary, style.flex1 ] }>
                     <DraggableFlatList
                         data = { workouts }
                         keyExtractor = { item => item.id.toString() }

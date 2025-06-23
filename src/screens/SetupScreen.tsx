@@ -123,7 +123,7 @@ export default function SetupScreen() {
             {workout.blocks.length === 0 ? (
                 <></>
             ) : (
-                <View style = { [ style.secondary, style.margin, style.padding, style.border, style.outlineThick, style.flex1 ] }>
+                <View style = { [ style.containerSecondary, style.flex1 ] }>
                     <Animated.FlatList
                         data = { workout.blocks }
                         ref = { flatList }
