@@ -96,4 +96,3 @@ jobs:
       with:
         name: ${{ steps.generate-apk-name.outputs.app-name }}
         path: android/app/build/outputs/apk/${{ inputs.build-type }}/${{ steps.generate-apk-name.outputs.app-name }}.apk
-        retention-days: 3
