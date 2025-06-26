@@ -94,9 +94,9 @@ export default function SetupScreen() {
     // jsx
     return (
         <View style = { [ style.containerPrimary ] }>
-            <View style = { [ style.containerSecondary ] }>
+            <View style = { [ style.containerSecondary, style.marginTop ] }>
                 <View style = { [ style.row ] }>
-                    <TextInput style = { [ style.text, style.input, style.normal, style.left, style.padding, style.border, style.outline, style.flex1  ] }
+                    <TextInput style = { [ style.text, style.normal, style.input, style.left, style.padding, style.border, style.outline, style.flex1 ] }
                         value = { workout.name }
                         maxLength = { 64 }
                         onChangeText = { (text) => { workout.name = text; update(); } }
@@ -123,20 +123,20 @@ export default function SetupScreen() {
             {workout.blocks.length === 0 ? (
                 <></>
             ) : (
-                <View style = { [ style.containerSecondary, style.flex1 ] }>
+                <View style = { [ style.containerSecondary, style.marginVertical, style.flex1 ] }>
                     <Animated.FlatList
                         data = { workout.blocks }
                         ref = { flatList }
                         keyExtractor = { (item) => item.id.toString() }
                         itemLayoutAnimation = { LinearTransition }
                         renderItem = {({ item, index }) => (
-                            <View style = { [ style.tertiary, style.marginVertical, style.padding, style.border, style.outlineThick, style.flex1 ] } key = { item.id }>
+                            <View style = { [ style.containerTertiary, (0 !== index ? style.marginTop : '') ] } key = { item.id }>
                                 <TimerBlockEditor
                                     workout = { workout }
                                     block = { item }
                                     onChange = { update }
                                 />
-                                <View style = { [ style.tertiary, style.marginTop, style.row ] }>
+                                <View style = { [ style.row, style.marginTop ] }>
                                     <TouchableOpacity style = { [ style.quaternary, style.marginTop, style.padding, style.button, (index === 0 ?  style.disabled : {}), style.border, style.outline ] }
                                         disabled = { index === 0 }
                                         onPress = { () => { moveBlock(index, Math.max(0, index - 1)); } }
