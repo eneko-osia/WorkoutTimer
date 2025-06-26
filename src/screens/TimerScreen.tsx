@@ -165,8 +165,8 @@ export default function TimerScreen() {
     // jsx
     return (
         <View style = { [ style.containerPrimary ] }>
-            <View style = { [ style.containerSecondary ] }>
-                <View style = { [ style.secondary, style.row ] }>
+            <View style = { [ style.containerSecondary, style.marginTop ] }>
+                <View style = { [ style.row ] }>
                     <Text style = { [ style.text, style.normal, style.bold, style.left, style.flex1 ] } numberOfLines = { 1 }>
                         { workout.name }
                     </Text>
@@ -176,14 +176,14 @@ export default function TimerScreen() {
                 </View>
             </View>
             {!isRunning ? (
-                <View style = { [ style.containerSecondary, style.flex1 ] }>
-                    <View style = { [ style.tertiary, style.padding, style.middle, style.border, style.outlineThick, style.flex1 ] }>
+                <View style = { [ style.containerSecondary, style.marginVertical, style.flex1 ] }>
+                    <View style = { [ style.containerTertiary, style.middle, style.flex1 ] }>
                         <MaterialIcons name = 'done' size = { theme.sizes.xl }/>
                     </View>
                 </View>
             ) : (
-                <View style = { [ style.containerSecondary, style.flex1 ] }>
-                    <View style = { [ style.tertiary, style.marginTop, style.padding, style.border, style.outlineThick ] }>
+                <View style = { [ style.containerSecondary, style.marginVertical, style.flex1 ] }>
+                    <View style = { [ style.containerTertiary ] }>
                         <Text style = { [ style.text, style.large, style.center ] } numberOfLines = { 1 }>
                             { workout.blocks[positionRef.current.blockIndex].subBlocks[positionRef.current.subBlockIndex].label }
                         </Text>
@@ -212,7 +212,7 @@ export default function TimerScreen() {
                             { formatDuration(timeLeftRef.current) }
                         </Text>
                     </View>
-                    <View style = { [ style.tertiary, style.marginVertical, style.padding, style.border, style.outlineThick ] }>
+                    <View style = { [ style.containerTertiary, style.marginTop ] }>
                         <Text style = { [ style.text, style.large, style.center ] } numberOfLines = { 1 }>
                             Set {positionRef.current.set} / {workout.blocks[positionRef.current.blockIndex].sets}
                         </Text>
