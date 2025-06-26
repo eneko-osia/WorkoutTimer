@@ -56,18 +56,20 @@ export const useStyles = (theme: Theme) => {
         // containers
         containerPrimary: {
             backgroundColor: theme.colors.primary,
-            borderColor: theme.colors.border,
-            borderRadius: theme.borderRadius.md,
             flex: 1,
-            margin: theme.spacing.xs,
-            padding: theme.spacing.xs,
         },
         containerSecondary: {
             backgroundColor: theme.colors.secondary,
             borderColor: theme.colors.border,
             borderRadius: theme.borderRadius.md,
             borderWidth: scale(2),
-            margin: theme.spacing.xs,
+            padding: theme.spacing.xs,
+        },
+        containerTertiary : {
+            backgroundColor: theme.colors.tertiary,
+            borderColor: theme.colors.border,
+            borderRadius: theme.borderRadius.md,
+            borderWidth: scale(2),
             padding: theme.spacing.xs,
         },
         row: {

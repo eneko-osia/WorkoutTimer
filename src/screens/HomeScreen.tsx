@@ -96,39 +96,45 @@ export default function HomeScreen() {
     // jsx
     return (
         <View style = { [ style.containerPrimary ] }>
-            <View style = { [ style.containerSecondary ] }>
-                <Text style = { [ style.text, style.large, style.bold, style.left ] } numberOfLines = { 1 }>
-                    Workouts
-                </Text>
-                <TouchableOpacity style = { [ style.quaternary, style.padding, style.button, style.border, style.outline ] }
-                    onPress = { () => { navigation.navigate('Setup', { workout: createWorkout(), pendingSave: true }); } }
-                >
-                    <MaterialIcons name = 'add' size = { theme.sizes.sm }/>
-                </TouchableOpacity>
+            <View style = { [ style.containerSecondary, style.marginTop ] }>
+                <View style = { [ style.row ] }>
+                    <Text style = { [ style.text, style.normal, style.bold, style.left, style.flex1 ] } numberOfLines = { 1 }>
+                        Workouts
+                    </Text>
+                    <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.padding, style.button, style.border, style.outline ] }
+                        onPress = { () => { navigation.navigate('Settings'); } }
+                    >
+                        <MaterialIcons name = 'settings' size = { theme.sizes.sm }/>
+                    </TouchableOpacity>
+                </View>
+                <View style = { [ style.row, style.marginTop ] }>
+                    <TouchableOpacity style = { [ style.quaternary, style.padding, style.button, style.border, style.outline, style.flex1 ] }
+                        onPress = { () => { navigation.navigate('Setup', { workout: createWorkout(), pendingSave: true }); } }
+                    >
+                        <MaterialIcons name = 'add' size = { theme.sizes.sm }/>
+                    </TouchableOpacity>
+                </View>
             </View>
             {workouts.length === 0 ? (
                 <></>
             ) : (
-                <View style = { [ style.containerSecondary, style.flex1 ] }>
+                <View style = { [ style.containerSecondary, style.marginVertical, style.flex1 ] }>
                     <DraggableFlatList
                         data = { workouts }
                         keyExtractor = { item => item.id.toString() }
                         onDragEnd = { ({ data }) => { setWorkouts(data); saveAsync(data); } }
                         scrollEnabled = { true }
-                        renderItem = {({ item: workout, drag, isActive }: RenderItemParams<Workout>) => (
-                            <View style = { [ style.tertiary, style.marginTop, style.padding, style.border, style.outlineThick ] } key = { workout.id }>
-                                {/* <Text style = { [ style.text, style.normal, style.bold ] }>
-                                    { workout.id }
-                                </Text> */}
-                                <View style = { [ style.tertiary, style.marginHorizontal, style.row ] }>
+                        renderItem = {({ item: workout, getIndex, drag, isActive }: RenderItemParams<Workout>) => (
+                            <View style = { [ style.containerTertiary, (0 !== getIndex() ? style.marginTop : '') ] } key = { workout.id }>
+                                <View style = { [ style.row ] }>
                                     <Text style = { [ style.text, style.normal, style.bold, style.left, style.flex1 ] } numberOfLines = { 1 }>
-                                        { workout.name }
+                                        { workout.name } 
                                     </Text>
                                     <Text style = { [ style.text, style.normal, style.bold, style.right ] } numberOfLines = { 1 }>
                                         { formatDuration(workout.totalDuration) }
                                     </Text>
                                 </View>
-                                <View style = { [ style.tertiary, style.marginTop, style.row ] }>
+                                <View style = { [ style.row, style.marginTop ] }>
                                     <TouchableOpacity style = { [ style.quaternary, style.padding, style.button, (workout.blocks.length === 0 ?  style.disabled : {}), style.border, style.outline, style.flex1 ] }
                                         disabled = { workout.blocks.length === 0 }
                                         onPress = { () => { navigation.navigate('Timer', { workout }); }}
