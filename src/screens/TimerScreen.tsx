@@ -140,22 +140,36 @@ export default function TimerScreen() {
     }, [ workout, isPaused, setState ]);
 
     // methods
-    const moveNextBlock = (_position: TimerPosition) => {
+    const moveToPrevBlock = () => {
         setIsPaused(true);
-        const _next = workout.findNextBlock(_position);
-        if (_next) {
-            setState(_next);
+        if (elapsedRef.current !== 0) {
+            setState(positionRef.current);
             update();
+        } else {
+            if (prevRef.current) {
+                setState(prevRef.current);
+                update();
+            }
         }
     }
 
-    const movePrevBlock = (_position: TimerPosition) => {
+    const moveToNextBlock = () => {
         setIsPaused(true);
-        const _prev = workout.findPrevBlock(_position);
-        if (_prev) {
-            setState(_prev);
+        if (nextRef.current) {
+            setState(nextRef.current);
             update();
         }
+        else {
+            setIsRunning(false);
+        }
+    }
+
+    const hasPrevBlock = () => {
+        return ((prevRef.current != null) || (elapsedRef.current !== 0));
+    }
+
+    const hasNextBlock = () => {
+        return ((nextRef.current != null) || (isRunning === true));
     }
 
     const update = () => {
@@ -188,9 +202,9 @@ export default function TimerScreen() {
                             { workout.blocks[positionRef.current.blockIndex].subBlocks[positionRef.current.subBlockIndex].label }
                         </Text>
                         <View style = { [ style.row, style.marginTop, style.border ] }>
-                            <TouchableOpacity style = { [ style.quaternary, style.padding, style.button, (prevRef.current == null ?  style.disabled : {}), style.border, style.outline ] }
-                                disabled = { prevRef.current == null }
-                                onPress = { () => { movePrevBlock(positionRef.current!); }}
+                            <TouchableOpacity style = { [ style.quaternary, style.padding, style.button, (!hasPrevBlock() ?  style.disabled : {}), style.border, style.outline ] }
+                                disabled = { !hasPrevBlock() }
+                                onPress = { () => { moveToPrevBlock(); }}
                             >
                                 <MaterialIcons name = 'skip-previous' size = { theme.sizes.md }/>
                             </TouchableOpacity>
@@ -199,9 +213,9 @@ export default function TimerScreen() {
                             >
                                 <MaterialIcons name = {isPaused ? 'play-arrow' : 'pause'} size = { theme.sizes.md }/>
                             </TouchableOpacity>
-                            <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.padding, style.button, (nextRef.current == null ?  style.disabled : {}), style.border, style.outline ] }
-                                disabled = { nextRef.current == null }
-                                onPress = { () => { moveNextBlock(positionRef.current!); }}
+                            <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.padding, style.button, (!hasNextBlock() ?  style.disabled : {}), style.border, style.outline ] }
+                                disabled = { !hasNextBlock() }
+                                onPress = { () => { moveToNextBlock(); }}
                             >
                                 <MaterialIcons name = 'skip-next' size = { theme.sizes.md }/>
                             </TouchableOpacity>

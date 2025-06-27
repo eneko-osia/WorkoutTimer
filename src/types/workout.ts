@@ -118,12 +118,13 @@ export class Workout {
     }
 
     findPrevBlock(position: TimerPosition): TimerPosition | null {
-        const block = this.blocks[position.blockIndex];
+        let block = this.blocks[position.blockIndex];
         if ((position.subBlockIndex - 1) >= 0) {
             return { blockIndex: position.blockIndex, subBlockIndex: (position.subBlockIndex - 1), set: position.set };
         } else if ((position.set - 1) >= 1) {
             return { blockIndex: position.blockIndex, subBlockIndex: block.subBlocks.length - 1, set: (position.set - 1) };
         } else if ((position.blockIndex - 1) >= 0) {
+            block = this.blocks[position.blockIndex - 1];
             return { blockIndex: (position.blockIndex - 1), subBlockIndex: block.subBlocks.length - 1, set: block.sets };
         }
         return null;
