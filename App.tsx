@@ -14,6 +14,7 @@ import { RootStackParamList } from './src/navigation/types';
 import { useStyles } from './src/styles/common';
 import { useTheme } from './src/styles/theme';
 import HomeScreen from  './src/screens/HomeScreen';
+import SettingsScreen from  './src/screens/SettingsScreen';
 import SetupScreen from './src/screens/SetupScreen';
 import TimerScreen from './src/screens/TimerScreen';
 
@@ -42,6 +43,7 @@ export default function App() {
                 <NavigationContainer theme = { theme } >
                     <Stack.Navigator initialRouteName = 'Home'>
                         <Stack.Screen name = 'Home' component = { HomeScreen } />
+                        <Stack.Screen name = 'Settings' component = { SettingsScreen } />
                         <Stack.Screen name = 'Setup' component = { SetupScreen } />
                         <Stack.Screen name = 'Timer' component = { TimerScreen } />
                     </Stack.Navigator>
