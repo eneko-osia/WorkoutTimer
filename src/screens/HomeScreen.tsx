@@ -125,7 +125,7 @@ export default function HomeScreen() {
                         onDragEnd = { ({ data }) => { setWorkouts(data); saveAsync(data); } }
                         scrollEnabled = { true }
                         renderItem = {({ item: workout, getIndex, drag, isActive }: RenderItemParams<Workout>) => (
-                            <View style = { [ style.containerTertiary, (0 !== getIndex() ? style.marginTop : '') ] } key = { workout.id }>
+                            <View style = { [ style.containerTertiary, (getIndex() !== 0 ? style.marginTop : '') ] } key = { workout.id }>
                                 <View style = { [ style.row ] }>
                                     <Text style = { [ style.text, style.normal, style.bold, style.left, style.flex1 ] } numberOfLines = { 1 }>
                                         { workout.name } 

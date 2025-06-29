@@ -14,30 +14,40 @@ import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { useStyles } from '../styles/common';
 import { useTheme } from '../styles/theme';
 
+// type definitions
+type Props = {
+    name: string
+    initialColor: string,
+};
+
 // component
-export default function SettingsColorPicker() {
+export default function SettingsColorPicker({name, initialColor} : Props) {
     // hooks
     const scheme = useColorScheme();
 
     // theme
     const theme = useTheme(scheme);
-    const style = StyleSheet.create({ ...useStyles(theme) })
+    const style = StyleSheet.create({ 
+        ...useStyles(theme),
+        preview: {
+            width: '100%',
+            height: '100%',
+        },
+     })
 
     // attributes
-    const [ color, setColor ]                   = useState('rgb(0, 0, 0)');
-    const [showColorPicker, setShowColorPicker] = useState(false);
+    const [ color, setColor ]                       = useState(initialColor);
+    const [ showColorPicker, setShowColorPicker ]   = useState(false);
 
     // jsx
     return (
         <>
-            <View style = { [ style.row ] }>
-                <Text style = { [ style.text, style.normal, style.bold, style.left, style.flex1 ] } numberOfLines = { 1 }>
-                    Primary
+            <View style = { [ style.row, style.padding ] }>
+                <Text style = { [ style.text, style.normal, style.left, style.flex1 ] } numberOfLines = { 1 }>
+                    {name}
                 </Text>
-                <View style = { [ {backgroundColor: color }, style.flex1 ] }>
-
-                </View>
-                <TouchableOpacity style = { [ style.quaternary, style.button, style.padding, style.border, style.outline ] }
+                <View style = { [ {backgroundColor: color }, style.preview, style.marginLeft, style.border, style.outlineThick, style.flex1 ] } />
+                <TouchableOpacity style = { [ style.quaternary, style.button, style.marginLeft, style.padding, style.border, style.outline ] }
                     onPress = { () => { setShowColorPicker(!showColorPicker); } }
                 >
                     <MaterialIcons name = 'format-color-fill' size = { theme.sizes.sm }/>
@@ -45,7 +55,7 @@ export default function SettingsColorPicker() {
             </View>
             {showColorPicker ? (
                 <View style = { [ style.marginTop ] } >
-                    <ColorPicker onChangeJS = { (colors) => { setColor(colors.rgba); }}>
+                    <ColorPicker onChangeJS = { (colors) => { setColor(colors.rgba); }} value = { initialColor } >
                         <Panel5 style = { [ style.border ] } />
                     </ColorPicker>
                 </View>

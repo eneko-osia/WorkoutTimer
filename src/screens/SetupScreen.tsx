@@ -130,7 +130,7 @@ export default function SetupScreen() {
                         keyExtractor = { (item) => item.id.toString() }
                         itemLayoutAnimation = { LinearTransition }
                         renderItem = {({ item, index }) => (
-                            <View style = { [ style.containerTertiary, (0 !== index ? style.marginTop : '') ] } key = { item.id }>
+                            <View style = { [ style.containerTertiary, (index !== 0 ? style.marginTop : '') ] } key = { item.id }>
                                 <TimerBlockEditor
                                     workout = { workout }
                                     block = { item }

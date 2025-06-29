@@ -32,10 +32,10 @@ export default function SettingsScreen() {
         // await saveSettings(Workout.kStorageKey, workout);
     };
 
-    const update = () => {
-        setPendingChanges(true);
-        // forceUpdate((_prev) => !_prev);
-    }
+    // const update = () => {
+    //     setPendingChanges(true);
+    //     // forceUpdate((_prev) => !_prev);
+    // }
 
     // jsx
     return (
@@ -55,15 +55,18 @@ export default function SettingsScreen() {
             </View>
             <View style = { [ style.containerSecondary, style.flex1 ] }>
                 <View style = { [ style.containerTertiary ] }>
-                    <View style = { [ style.marginHorizontal, style.row ] }>
-                        <Text style = { [ style.text, style.normal, style.bold, style.left, style.marginRight, style.flex1 ] } numberOfLines = { 1 }>
+                    <View style = { [ style.row ] }>
+                        <Text style = { [ style.text, style.normal, style.bold, style.left, style.flex1 ] } numberOfLines = { 1 }>
                             Colors
                         </Text>
                     </View>
                     <View style = { [ style.secondary, style.border ] }>
-                        <SettingsColorPicker />
-                        <SettingsColorPicker />
-                        <SettingsColorPicker />
+                        <SettingsColorPicker name='Primary' initialColor = { theme.colors.primary } />
+                        <SettingsColorPicker name='Secondary' initialColor = { theme.colors.secondary } />
+                        <SettingsColorPicker name='Tertiary' initialColor = { theme.colors.tertiary } />
+                        <SettingsColorPicker name='Button' initialColor = { theme.colors.quaternary } />
+                        <SettingsColorPicker name='Text' initialColor = { theme.colors.text } />
+                        <SettingsColorPicker name='Text Backgound' initialColor = { theme.colors.input } />
                     </View>
                 </View>
             </View>
