@@ -1,5 +1,5 @@
 // react imports
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     StyleSheet,
     Text,
@@ -30,13 +30,13 @@ export default function TimerScreen() {
 
     // theme
     const theme = useTheme(scheme);
-    const style = StyleSheet.create({
+    const style = useMemo(() => StyleSheet.create({
         ...useStyles(theme),
         middle: {
             alignItems: 'center',
             justifyContent: 'center',
         },
-    })
+    }), [ theme ]);
 
     // attributes
     const { workout }                           = route.params;
@@ -67,6 +67,9 @@ export default function TimerScreen() {
         // find prev and next timer positions
         nextRef.current = workout.findNextBlock(_position);
         prevRef.current = workout.findPrevBlock(_position);
+
+        // update
+        update();
     }, [ workout ]);
 
     // effects
@@ -140,41 +143,38 @@ export default function TimerScreen() {
     }, [ workout, isPaused, setState ]);
 
     // methods
-    const moveToPrevBlock = () => {
+    const moveToPrevBlock = useCallback(() => {
         setIsPaused(true);
         if (elapsedRef.current !== 0) {
             setState(positionRef.current);
-            update();
         } else {
             if (prevRef.current) {
                 setState(prevRef.current);
-                update();
             }
         }
-    }
+    }, [ setState ]);
 
-    const moveToNextBlock = () => {
+    const moveToNextBlock = useCallback(() => {
         setIsPaused(true);
         if (nextRef.current) {
             setState(nextRef.current);
-            update();
         }
         else {
             setIsRunning(false);
         }
-    }
+    }, [ setState ]);
 
-    const hasPrevBlock = () => {
+    const hasPrevBlock = useCallback(() => {
         return ((prevRef.current != null) || (elapsedRef.current !== 0));
-    }
+    }, []);
 
-    const hasNextBlock = () => {
+    const hasNextBlock = useCallback(() => {
         return ((nextRef.current != null) || (isRunning === true));
-    }
+    }, [ isRunning ]);
 
-    const update = () => {
+    const update = useCallback(() => {
         forceUpdate((_prev) => !_prev);
-    }
+    }, []);
 
     // jsx
     return (
