@@ -1,13 +1,13 @@
 // react imports
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
-    StyleSheet,
     Text,
     TouchableOpacity,
     useColorScheme,
     View,
 } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
+import BackgroundTimer, { IntervalId } from 'react-native-background-timer';
 import IdleTimerManager from 'react-native-idle-timer';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import SoundPlayer from 'react-native-sound-player';
@@ -30,13 +30,7 @@ export default function TimerScreen() {
 
     // theme
     const theme = useTheme(scheme);
-    const style = useMemo(() => StyleSheet.create({
-        ...useStyles(theme),
-        middle: {
-            alignItems: 'center',
-            justifyContent: 'center',
-        },
-    }), [ theme ]);
+    const style = useStyles(theme);
 
     // attributes
     const { workout }                           = route.params;
@@ -49,7 +43,7 @@ export default function TimerScreen() {
     const positionRef                           = useRef<TimerPosition>({ blockIndex: 0, subBlockIndex: 0, set: 1});
     const prevRef                               = useRef<TimerPosition | null>(null);
     const timeLeftRef                           = useRef<number>(0);
-    const timerRef                              = useRef<NodeJS.Timeout | null>(null);
+    const timerRef                              = useRef<IntervalId>(0);
 
     // callbacks
     const setState = useCallback((_position: TimerPosition, _elapsed: number = 0) => {
@@ -68,8 +62,8 @@ export default function TimerScreen() {
         nextRef.current = workout.findNextBlock(_position);
         prevRef.current = workout.findPrevBlock(_position);
 
-        // update
-        update();
+        // force update
+        forceUpdate((_prev) => !_prev);
     }, [ workout ]);
 
     // effects
@@ -97,7 +91,7 @@ export default function TimerScreen() {
         let _start = (Date.now() - (elapsedRef.current * 1000));
         setState(positionRef.current, elapsedRef.current);
 
-        timerRef.current = setInterval(() => {
+        timerRef.current = BackgroundTimer.setInterval(() => {
             // calculate elapsed time
             const _millisecondElapsed = Math.max(0, Date.now() - _start);
             const _secondsElapsed = Math.floor(_millisecondElapsed / 1000);
@@ -108,7 +102,7 @@ export default function TimerScreen() {
             elapsedRef.current = _secondsElapsed;
             elapsedTotalRef.current = _elapsedTotal + _secondsElapsed;
             timeLeftRef.current = _secondsLeft;
-            update();
+            forceUpdate((_prev) => !_prev);
 
             // play beep sound effect only in the last 3 seconds
             if ((_secondsLeft >= 1 && _secondsLeft <= 3) && (_lastBeepSound !== _secondsLeft)) {
@@ -132,13 +126,13 @@ export default function TimerScreen() {
                     setState(positionRef.current);
                 } else {
                     setIsRunning(false);
-                    clearTimeout(timerRef.current!);
+                    BackgroundTimer.clearTimeout(timerRef.current!);
                 }
             }
         }, 100);
 
         return () => {
-            clearTimeout(timerRef.current!);
+            BackgroundTimer.clearTimeout(timerRef.current!);
         }
     }, [ workout, isPaused, setState ]);
 
@@ -172,10 +166,6 @@ export default function TimerScreen() {
         return ((nextRef.current != null) || (isRunning === true));
     }, [ isRunning ]);
 
-    const update = useCallback(() => {
-        forceUpdate((_prev) => !_prev);
-    }, []);
-
     // jsx
     return (
         <View style = { [ style.containerPrimary ] }>
@@ -191,7 +181,7 @@ export default function TimerScreen() {
             </View>
             {!isRunning ? (
                 <View style = { [ style.containerSecondary, style.marginVertical, style.flex1 ] }>
-                    <View style = { [ style.containerTertiary, style.middle, style.flex1 ] }>
+                    <View style = { [ style.containerTertiary, style.row, style.flex1 ] }>
                         <MaterialIcons name = 'done' size = { theme.sizes.xl }/>
                     </View>
                 </View>
@@ -221,14 +211,14 @@ export default function TimerScreen() {
                             </TouchableOpacity>
                         </View>
                     </View>
-                    <View style = { [ { backgroundColor: workout.blocks[positionRef.current.blockIndex].subBlocks[positionRef.current.subBlockIndex].color }, style.middle, style.marginTop, style.border, style.outlineThick, style.flex1 ] }>
+                    <View style = { [ { backgroundColor: workout.blocks[positionRef.current.blockIndex].subBlocks[positionRef.current.subBlockIndex].color }, style.row, style.marginTop, style.border, style.outlineThick, style.flex1 ] }>
                         <Text style = { [ style.text, style.xxlarge, style.bold, style.center ] } numberOfLines = { 1 }>
                             { formatDuration(timeLeftRef.current) }
                         </Text>
                     </View>
                     <View style = { [ style.containerTertiary, style.marginTop ] }>
                         <Text style = { [ style.text, style.large, style.center ] } numberOfLines = { 1 }>
-                            Set {positionRef.current.set} / {workout.blocks[positionRef.current.blockIndex].sets}
+                            Set { positionRef.current.set } / { workout.blocks[positionRef.current.blockIndex].sets }
                         </Text>
                     </View>
                 </View>
