@@ -1,10 +1,9 @@
 // react imports
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import {
     Alert,
     FlatList,
     Platform,
-    StyleSheet,
     TextInput,
     TouchableOpacity,
     useColorScheme,
@@ -36,7 +35,7 @@ export default function SetupScreen() {
 
     // theme
     const theme = useTheme(scheme);
-    const style = StyleSheet.create({ ...useStyles(theme) })
+    const style = useStyles(theme);
 
     // attributes
     const { workout, pendingSave }              = route.params;
@@ -45,28 +44,33 @@ export default function SetupScreen() {
     const flatList                              = useRef<FlatList>(null);
 
     // methods
-    const createBlock = () => {
+    const update = useCallback(() => {
+        setPendingChanges(true);
+        forceUpdate((_prev) => !_prev);
+    }, []);
+
+    const createBlock = useCallback(() => {
         {
             const blockId: number = workout.createBlock();
             workout.createSubBlock(blockId, 'New Block');
         }
         update();
         flatList.current?.scrollToEnd({ animated: true });
-    };
+    }, [ workout, update ]);
 
-    const deleteBlock = (blockId: number) => {
+    const deleteBlock = useCallback((blockId: number) => {
         workout.deleteBlock(blockId)
         update();
-    };
+    }, [ workout, update ]);
 
-    const moveBlock = (fromIndex: number, toIndex: number) => {
+    const moveBlock = useCallback((fromIndex: number, toIndex: number) => {
         if (fromIndex === toIndex) { return; }
         const [ item ] = workout.blocks.splice(fromIndex, 1);
         workout.blocks.splice(toIndex, 0, item);
         update();
-    }
+    }, [ workout, update ]);
 
-    const removeBlock = (blockId: number) => {
+    const removeBlock = useCallback((blockId: number) => {
         if (Platform.OS === 'web') {
             deleteBlock(blockId);
         }
@@ -79,17 +83,12 @@ export default function SetupScreen() {
                 { text: 'Delete', style: 'destructive', onPress: () => { deleteBlock(blockId); } }
             ]);
         }
-    }
+    }, [ deleteBlock ]);
 
-    const saveAsync = async () => {
+    const saveAsync = useCallback(async () => {
         setPendingChanges(false);
         await saveWorkout(Workout.kStorageKey, workout);
-    };
-
-    const update = () => {
-        setPendingChanges(true);
-        forceUpdate((_prev) => !_prev);
-    }
+    }, [ workout ]);
 
     // jsx
     return (
