@@ -6,19 +6,19 @@ export type TimerSubBlock = {
     label: string;
     duration: number;
     color: string;
-};
+}
 
 export type TimerBlock = {
     id: number;
     sets: number;
     subBlocks: TimerSubBlock[];
-};
+}
 
 export type TimerPosition = {
     blockIndex: number;
     subBlockIndex: number;
     set: number;
-};
+}
 
 export class Workout {
     static readonly kMinSets: number = 1;

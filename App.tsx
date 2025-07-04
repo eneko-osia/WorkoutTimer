@@ -2,7 +2,6 @@
 import React from 'react';
 import {
     StatusBar,
-    StyleSheet,
     useColorScheme,
 } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -28,7 +27,7 @@ export default function App() {
 
     // theme
     const theme = useTheme(scheme);
-    const style = StyleSheet.create({ ...useStyles(theme) })
+    const style = useStyles(theme);
 
     // jsx
     return (
@@ -42,10 +41,10 @@ export default function App() {
             <GestureHandlerRootView style = { style.flex1 } >
                 <NavigationContainer theme = { theme } >
                     <Stack.Navigator initialRouteName = 'Home'>
-                        <Stack.Screen name = 'Home' component = { HomeScreen } />
+                        <Stack.Screen name = 'Home'     component = { HomeScreen } />
                         <Stack.Screen name = 'Settings' component = { SettingsScreen } />
-                        <Stack.Screen name = 'Setup' component = { SetupScreen } />
-                        <Stack.Screen name = 'Timer' component = { TimerScreen } />
+                        <Stack.Screen name = 'Setup'    component = { SetupScreen } />
+                        <Stack.Screen name = 'Timer'    component = { TimerScreen } />
                     </Stack.Navigator>
                 </NavigationContainer>
             </GestureHandlerRootView>

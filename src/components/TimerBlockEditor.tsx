@@ -21,8 +21,8 @@ import TimerSubBlockEditor from './TimerSubBlockEditor';
 // type definitions
 type Props = {
     workout: Workout,
-    block: TimerBlock;
-    onChange: () => void;
+    block: TimerBlock,
+    onChange: () => void,
 };
 
 // component
