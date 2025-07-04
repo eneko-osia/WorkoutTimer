@@ -41,12 +41,12 @@ export default function SetupScreen() {
     const { workout, pendingSave }              = route.params;
     const [ , forceUpdate ]                     = useState(false);
     const [ pendingChanges, setPendingChanges ] = useState(pendingSave);
-    const flatList                              = useRef<FlatList>(null);
+    const flatListRef                           = useRef<FlatList>(null);
 
     // methods
     const update = useCallback(() => {
         setPendingChanges(true);
-        forceUpdate((_prev) => !_prev);
+        forceUpdate(_prev => !_prev);
     }, []);
 
     const createBlock = useCallback(() => {
@@ -55,7 +55,7 @@ export default function SetupScreen() {
             workout.createSubBlock(blockId, 'New Block');
         }
         update();
-        flatList.current?.scrollToEnd({ animated: true });
+        flatListRef.current?.scrollToEnd({ animated: true });
     }, [ workout, update ]);
 
     const deleteBlock = useCallback((blockId: number) => {
@@ -90,6 +90,36 @@ export default function SetupScreen() {
         await saveWorkout(Workout.kStorageKey, workout);
     }, [ workout ]);
 
+    const renderBlockItem = ({ item, index }: any) => (
+        <View style = { [ style.containerTertiary, (index !== 0 ? style.marginTop : '') ] } key = { item.id }>
+            <TimerBlockEditor
+                workout = { workout }
+                block = { item }
+                onChange = { update }
+            />
+            <View style = { [ style.row, style.marginTop ] }>
+                <TouchableOpacity style = { [ style.quaternary, style.marginTop, style.padding, style.button, (index === 0 ?  style.disabled : {}), style.border, style.outline ] }
+                    disabled = { index === 0 }
+                    onPress = { () => { moveBlock(index, Math.max(0, index - 1)); } }
+                >
+                    <MaterialIcons name = 'arrow-upward' size = { theme.sizes.sm }/>
+                </TouchableOpacity>
+                <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.marginTop, style.padding, style.button, (workout.blocks.length <= 1 ?  style.disabled : {}), style.border, style.outline, style.flex1 ] }
+                    disabled = { workout.blocks.length <= 1 }
+                    onPress = { () => { removeBlock(item.id); } }
+                >
+                    <MaterialIcons name = 'delete' size = { theme.sizes.sm }/>
+                </TouchableOpacity>
+                <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.marginTop, style.padding, (index === (workout.blocks.length - 1) ?  style.disabled : {}), style.button, style.border, style.outline ] }
+                    disabled = { index === (workout.blocks.length - 1) }
+                    onPress = { () => { moveBlock(index, Math.min((workout.blocks.length - 1), index + 1)); } }
+                >
+                    <MaterialIcons name = 'arrow-downward' size = { theme.sizes.sm }/>
+                </TouchableOpacity>
+            </View>
+        </View>
+    );
+
     // jsx
     return (
         <View style = { [ style.containerPrimary ] }>
@@ -119,44 +149,14 @@ export default function SetupScreen() {
                     <MaterialIcons name = 'add' size = { theme.sizes.sm }/>
                 </TouchableOpacity>
             </View>
-            {workout.blocks.length === 0 ? (
-                <></>
-            ) : (
+            {workout.blocks.length > 0 && (
                 <View style = { [ style.containerSecondary, style.marginVertical, style.flex1 ] }>
                     <Animated.FlatList
                         data = { workout.blocks }
-                        ref = { flatList }
+                        ref = { flatListRef }
                         keyExtractor = { (item) => item.id.toString() }
                         itemLayoutAnimation = { LinearTransition }
-                        renderItem = {({ item, index }) => (
-                            <View style = { [ style.containerTertiary, (index !== 0 ? style.marginTop : '') ] } key = { item.id }>
-                                <TimerBlockEditor
-                                    workout = { workout }
-                                    block = { item }
-                                    onChange = { update }
-                                />
-                                <View style = { [ style.row, style.marginTop ] }>
-                                    <TouchableOpacity style = { [ style.quaternary, style.marginTop, style.padding, style.button, (index === 0 ?  style.disabled : {}), style.border, style.outline ] }
-                                        disabled = { index === 0 }
-                                        onPress = { () => { moveBlock(index, Math.max(0, index - 1)); } }
-                                    >
-                                        <MaterialIcons name = 'arrow-upward' size = { theme.sizes.sm }/>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.marginTop, style.padding, style.button, (workout.blocks.length <= 1 ?  style.disabled : {}), style.border, style.outline, style.flex1 ] }
-                                        disabled = { workout.blocks.length <= 1 }
-                                        onPress = { () => { removeBlock(item.id); } }
-                                    >
-                                        <MaterialIcons name = 'delete' size = { theme.sizes.sm }/>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.marginTop, style.padding, (index === (workout.blocks.length - 1) ?  style.disabled : {}), style.button, style.border, style.outline ] }
-                                        disabled = { index === (workout.blocks.length - 1) }
-                                        onPress = { () => { moveBlock(index, Math.min((workout.blocks.length - 1), index + 1)); } }
-                                    >
-                                        <MaterialIcons name = 'arrow-downward' size = { theme.sizes.sm }/>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        )}
+                        renderItem = { renderBlockItem }
                     />
                 </View>
             )}
