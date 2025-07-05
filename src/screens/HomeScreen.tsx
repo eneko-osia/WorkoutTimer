@@ -1,9 +1,8 @@
 // react imports
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
     Alert,
     Platform,
-    StyleSheet,
     Text,
     TouchableOpacity,
     useColorScheme,
@@ -15,10 +14,11 @@ import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flat
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 // project imports
-import { deleteWorkout, loadWorkouts, saveWorkouts } from '../utils/storage';
+import { deleteWorkout, loadSettings, loadWorkouts, saveWorkouts } from '../utils/storage';
 import { formatDuration } from '../utils/format';
 import { generateId } from '../utils/id';
 import { RootStackParamList } from '../navigation/types';
+import { Settings } from '../types/settings'
 import { useStyles } from '../styles/common';
 import { useTheme } from '../styles/theme';
 import { Workout } from '../types/workout';
@@ -29,25 +29,19 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'H
 // screen
 export default function HomeScreen() {
     // hooks
-    const navigation = useNavigation<HomeScreenNavigationProp>();
-    const scheme = useColorScheme();
+    const navigation    = useNavigation<HomeScreenNavigationProp>();
+    const scheme        = useColorScheme();
 
     // theme
     const theme = useTheme(scheme);
-    const style = StyleSheet.create({ ...useStyles(theme) })
+    const style = useStyles(theme);
 
     // attributes
+    const [ settings, setSettings ] = useState<Settings | null>(null);
     const [ workouts, setWorkouts ] = useState<Workout[]>([]);
 
-    // effects
-    useFocusEffect(
-        useCallback(() => {
-            loadAsync();
-        }, [])
-    );
-
     // methods
-    const createWorkout = () => {
+    const createWorkout = useCallback(() => {
         const workout: Workout = new Workout({ id: generateId(), name: 'New Workout' });
         {
             const blockId: number = workout.createBlock();
@@ -63,11 +57,28 @@ export default function HomeScreen() {
             workout.createSubBlock(blockId, 'Cooldown', 60);
         }
         return workout;
-    }
+    }, []);
 
-    const removeWorkout = (workout: Workout) => {
+    const loadSettingsAsync = useCallback(async () => {
+        setSettings(await loadSettings(Settings.kStorageKey));
+    }, []);
+
+    const loadWorkoutsAsync = useCallback(async () => {
+        setWorkouts(await loadWorkouts(Workout.kStorageKey));
+    }, []);
+
+    const saveWorkoutAsync = useCallback(async (_workouts: Workout[]) => {
+        await saveWorkouts(Workout.kStorageKey, _workouts);
+    }, []);
+
+    const deleteWorkoutAsync = useCallback(async (id: number) => {
+        await deleteWorkout(Workout.kStorageKey, id);
+        loadWorkoutsAsync();
+    }, [ loadWorkoutsAsync ]);
+
+    const removeWorkout = useCallback((workout: Workout) => {
         if (Platform.OS === 'web') {
-            deleteAsync(workout.id);
+            deleteWorkoutAsync(workout.id);
         }
         else {
             Alert.alert(
@@ -75,25 +86,61 @@ export default function HomeScreen() {
             `Are you sure you want to delete "${workout.name}"?`,
             [
                 { text: 'Cancel', style: 'cancel' },
-                { text: 'Delete', style: 'destructive', onPress: () => { deleteAsync(workout.id); } }
+                { text: 'Delete', style: 'destructive', onPress: () => { deleteWorkoutAsync(workout.id); } }
             ]);
         }
-    }
+    }, [ deleteWorkoutAsync ]);
 
-    const deleteAsync = async (id: number) => {
-        await deleteWorkout(Workout.kStorageKey, id);
-        loadAsync();
-    }
+    // effects
+    useFocusEffect(() => {
+        loadSettingsAsync();
+        loadWorkoutsAsync();
+    });
 
-    const loadAsync = async () => {
-        setWorkouts(await loadWorkouts(Workout.kStorageKey));
-    };
-
-    const saveAsync = async (_workouts: Workout[]) => {
-        await saveWorkouts(Workout.kStorageKey, _workouts);
-    };
+    useEffect(() => {
+        if (settings) {
+            theme.colors = settings.getColors(scheme);
+        }
+    }, [ scheme, settings, theme ]);
 
     // jsx
+    const renderItem = ({ item: workout, getIndex, drag, isActive }: RenderItemParams<Workout>) => (
+        <View style = { [ style.containerTertiary, (getIndex() !== 0 ? style.marginTop : '') ] } key = { workout.id }>
+            <View style = { [ style.row ] }>
+                <Text style = { [ style.text, style.normal, style.bold, style.left, style.flex1 ] } numberOfLines = { 1 }>
+                    { workout.name }
+                </Text>
+                <Text style = { [ style.text, style.normal, style.bold, style.right ] } numberOfLines = { 1 }>
+                    { formatDuration(workout.totalDuration) }
+                </Text>
+            </View>
+            <View style = { [ style.row, style.marginTop ] }>
+                <TouchableOpacity style = { [ style.quaternary, style.padding, style.button, (workout.blocks.length === 0 ?  style.disabled : {}), style.border, style.outline, style.flex1 ] }
+                    disabled = { workout.blocks.length === 0 }
+                    onPress = { () => { navigation.navigate('Timer', { workout }); }}
+                >
+                    <MaterialIcons name = 'play-arrow' size = { theme.sizes.sm }/>
+                </TouchableOpacity>
+                <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.padding, style.button, style.border, style.outline ] }
+                    onPress = { () => { navigation.navigate('Setup', { workout: workout, pendingSave: false }); }}
+                >
+                    <MaterialIcons name = 'edit' size = { theme.sizes.sm }/>
+                </TouchableOpacity>
+                <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.padding, style.button, style.border, style.outline ] }
+                    onPress = { () => { removeWorkout(workout); } }
+                >
+                    <MaterialIcons name = 'delete' size = { theme.sizes.sm }/>
+                </TouchableOpacity>
+                <TouchableOpacity style = { [ style.padding ] }
+                    disabled = { isActive }
+                    onPressOut = { drag }
+                >
+                    <MaterialIcons name = 'reorder' size = { theme.sizes.sm }/>
+                </TouchableOpacity>
+            </View>
+        </View>
+    );
+
     return (
         <View style = { [ style.containerPrimary ] }>
             <View style = { [ style.containerSecondary, style.marginTop ] }>
@@ -115,51 +162,14 @@ export default function HomeScreen() {
                     </TouchableOpacity>
                 </View>
             </View>
-            {workouts.length === 0 ? (
-                <></>
-            ) : (
+            {workouts.length > 0 && (
                 <View style = { [ style.containerSecondary, style.marginVertical, style.flex1 ] }>
                     <DraggableFlatList
-                        data = { workouts }
-                        keyExtractor = { item => item.id.toString() }
-                        onDragEnd = { ({ data }) => { setWorkouts(data); saveAsync(data); } }
-                        scrollEnabled = { true }
-                        renderItem = {({ item: workout, getIndex, drag, isActive }: RenderItemParams<Workout>) => (
-                            <View style = { [ style.containerTertiary, (getIndex() !== 0 ? style.marginTop : '') ] } key = { workout.id }>
-                                <View style = { [ style.row ] }>
-                                    <Text style = { [ style.text, style.normal, style.bold, style.left, style.flex1 ] } numberOfLines = { 1 }>
-                                        { workout.name } 
-                                    </Text>
-                                    <Text style = { [ style.text, style.normal, style.bold, style.right ] } numberOfLines = { 1 }>
-                                        { formatDuration(workout.totalDuration) }
-                                    </Text>
-                                </View>
-                                <View style = { [ style.row, style.marginTop ] }>
-                                    <TouchableOpacity style = { [ style.quaternary, style.padding, style.button, (workout.blocks.length === 0 ?  style.disabled : {}), style.border, style.outline, style.flex1 ] }
-                                        disabled = { workout.blocks.length === 0 }
-                                        onPress = { () => { navigation.navigate('Timer', { workout }); }}
-                                    >
-                                        <MaterialIcons name = 'play-arrow' size = { theme.sizes.sm }/>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.padding, style.button, style.border, style.outline ] }
-                                        onPress = { () => { navigation.navigate('Setup', { workout: workout, pendingSave: false }); }}
-                                    >
-                                        <MaterialIcons name = 'edit' size = { theme.sizes.sm }/>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style = { [ style.quaternary, style.marginLeft, style.padding, style.button, style.border, style.outline ] }
-                                        onPress = { () => { removeWorkout(workout); } }
-                                    >
-                                        <MaterialIcons name = 'delete' size = { theme.sizes.sm }/>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style = { [ style.padding ] }
-                                        disabled = { isActive }
-                                        onPressOut = { drag }
-                                    >
-                                        <MaterialIcons name = 'reorder' size = { theme.sizes.sm }/>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        )}
+                        data            = { workouts }
+                        keyExtractor    = { item => item.id.toString() }
+                        onDragEnd       = { ({ data }) => { setWorkouts(data); saveWorkoutAsync(data); } }
+                        scrollEnabled   = { true }
+                        renderItem      = { renderItem }
                     />
                 </View>
             )}

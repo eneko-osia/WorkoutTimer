@@ -1,7 +1,6 @@
 // react imports
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
-    StyleSheet,
     Text,
     TouchableOpacity,
     useColorScheme,
@@ -9,8 +8,11 @@ import {
 } from 'react-native';
 
 // project imports
+import { Colors } from '../types/colors'
+import { useDarkTheme, useDefaultTheme, useLightTheme, useTheme } from '../styles/theme';
+import { loadSettings, saveSettings } from '../utils/storage';
+import { Settings } from '../types/settings'
 import { useStyles } from '../styles/common';
-import { useTheme } from '../styles/theme';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import SettingsColorPicker from '../components/SettingsColorPicker';
 
@@ -20,27 +22,48 @@ export default function SettingsScreen() {
     const scheme = useColorScheme();
 
     // theme
-    const theme = useTheme(scheme);
-    const style = StyleSheet.create({ ...useStyles(theme) })
+    const darkTheme     = useDarkTheme();
+    const defaultTheme  = useDefaultTheme(scheme);
+    const lightTheme    = useLightTheme();
+    const theme         = useTheme(scheme);
+    const style         = useStyles(theme);
 
     // attributes
+    const [ , forceUpdate ]                     = useState(false);
     const [ pendingChanges, setPendingChanges ] = useState(false);
+    const [ settings, setSettings ]             = useState<Settings | null>(null);
+    const colorsRef                             = useRef<Colors | null>(null);
 
     // methods
-    const saveAsync = async () => {
+    const saveAsync = useCallback (async () => {
         setPendingChanges(false);
-        // await saveSettings(Workout.kStorageKey, workout);
-    };
+        if (settings) {
+            await saveSettings(Settings.kStorageKey, settings);
+        }
+    }, [ settings ]);
 
-    // const update = () => {
-    //     setPendingChanges(true);
-    //     // forceUpdate((_prev) => !_prev);
-    // }
+    const update = useCallback(() => {
+        setPendingChanges(true);
+        forceUpdate(_prev => !_prev);
+    }, []);
+
+    // effects
+    useEffect(() => {
+        const loadSettingsAsync = async () => {
+            let _settings = await loadSettings(Settings.kStorageKey);
+            if (!_settings) {
+                _settings = new Settings({ dark: new Colors(darkTheme.colors), light: new Colors(lightTheme.colors) });
+            }
+            colorsRef.current = _settings.getColors(scheme);
+            setSettings(_settings);
+        }
+        loadSettingsAsync();
+    }, [ darkTheme, lightTheme, scheme ]);
 
     // jsx
     return (
         <View style = { [ style.containerPrimary ] }>
-            <View style = { [ style.containerSecondary ] }>
+            <View style = { [ style.containerSecondary, style.marginTop ] }>
                 <View style = { [ style.row ] }>
                     <Text style = { [ style.text, style.normal, style.bold, style.left, style.flex1 ] } numberOfLines = { 1 }>
                         Settings
@@ -53,21 +76,53 @@ export default function SettingsScreen() {
                     </TouchableOpacity>
                 </View>
             </View>
-            <View style = { [ style.containerSecondary, style.flex1 ] }>
+            <View style = { [ style.containerSecondary, style.marginVertical, style.flex1 ] }>
                 <View style = { [ style.containerTertiary ] }>
                     <View style = { [ style.row ] }>
                         <Text style = { [ style.text, style.normal, style.bold, style.left, style.flex1 ] } numberOfLines = { 1 }>
                             Colors
                         </Text>
                     </View>
-                    <View style = { [ style.secondary, style.border ] }>
-                        <SettingsColorPicker name='Primary' initialColor = { theme.colors.primary } />
-                        <SettingsColorPicker name='Secondary' initialColor = { theme.colors.secondary } />
-                        <SettingsColorPicker name='Tertiary' initialColor = { theme.colors.tertiary } />
-                        <SettingsColorPicker name='Button' initialColor = { theme.colors.quaternary } />
-                        <SettingsColorPicker name='Text' initialColor = { theme.colors.text } />
-                        <SettingsColorPicker name='Text Backgound' initialColor = { theme.colors.input } />
-                    </View>
+                    {colorsRef.current && (
+                        <View style = { [ style.secondary, style.border ] }>
+                            <SettingsColorPicker
+                                name ='Primary'
+                                defaultColor = { defaultTheme.colors.primary }
+                                initialColor = { colorsRef.current.primary }
+                                onChange = { (color: string) => { colorsRef.current!.primary = color; theme.colors.primary = color; update(); } }
+                            />
+                            <SettingsColorPicker
+                                name ='Secondary'
+                                defaultColor = { defaultTheme.colors.secondary }
+                                initialColor = { colorsRef.current.secondary }
+                                onChange = { (color: string) => { colorsRef.current!.secondary = color; theme.colors.secondary = color; update(); } }
+                            />
+                            <SettingsColorPicker
+                                name ='Tertiary'
+                                defaultColor = { defaultTheme.colors.tertiary }
+                                initialColor = { colorsRef.current.tertiary }
+                                onChange = { (color: string) => { colorsRef.current!.tertiary = color; theme.colors.tertiary = color; update(); } }
+                            />
+                            <SettingsColorPicker
+                                name ='Button'
+                                defaultColor = { defaultTheme.colors.quaternary }
+                                initialColor = { colorsRef.current.quaternary }
+                                onChange = { (color: string) => { colorsRef.current!.quaternary = color; theme.colors.quaternary = color; update(); } }
+                            />
+                            <SettingsColorPicker
+                                name ='Text'
+                                defaultColor = { defaultTheme.colors.text }
+                                initialColor = { colorsRef.current.text }
+                                onChange = { (color: string) => { colorsRef.current!.text = color; theme.colors.text = color; update(); } }
+                            />
+                            <SettingsColorPicker
+                                name ='Text Backgound'
+                                defaultColor = { defaultTheme.colors.input }
+                                initialColor = { colorsRef.current.input }
+                                onChange = { (color: string) => { colorsRef.current!.input = color; theme.colors.input = color; update(); } }
+                            />
+                        </View>
+                    )}
                 </View>
             </View>
         </View>

@@ -1,7 +1,6 @@
 // react imports
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
-    StyleSheet,
     Text,
     TouchableOpacity,
     useColorScheme,
@@ -16,28 +15,30 @@ import { useTheme } from '../styles/theme';
 
 // type definitions
 type Props = {
-    name: string
+    name: string,
+    defaultColor: string,
     initialColor: string,
+    onChange: (color: string) => void,
 };
 
 // component
-export default function SettingsColorPicker({name, initialColor} : Props) {
+export default function SettingsColorPicker({name, defaultColor, initialColor, onChange} : Props) {
     // hooks
     const scheme = useColorScheme();
 
     // theme
     const theme = useTheme(scheme);
-    const style = StyleSheet.create({ 
-        ...useStyles(theme),
-        preview: {
-            width: '100%',
-            height: '100%',
-        },
-     })
+    const style = useStyles(theme);
 
     // attributes
     const [ color, setColor ]                       = useState(initialColor);
     const [ showColorPicker, setShowColorPicker ]   = useState(false);
+
+    // methods
+    const updateColor = useCallback((_color: string) => {
+        setColor(_color);
+        onChange(_color);
+    }, [ onChange ]);
 
     // jsx
     return (
@@ -48,19 +49,22 @@ export default function SettingsColorPicker({name, initialColor} : Props) {
                 </Text>
                 <View style = { [ {backgroundColor: color }, style.preview, style.marginLeft, style.border, style.outlineThick, style.flex1 ] } />
                 <TouchableOpacity style = { [ style.quaternary, style.button, style.marginLeft, style.padding, style.border, style.outline ] }
+                    onPress = { () => updateColor(defaultColor) }
+                >
+                    <MaterialIcons name = 'format-color-reset' size = { theme.sizes.sm }/>
+                </TouchableOpacity>
+                <TouchableOpacity style = { [ style.quaternary, style.button, style.marginLeft, style.padding, style.border, style.outline ] }
                     onPress = { () => { setShowColorPicker(!showColorPicker); } }
                 >
                     <MaterialIcons name = 'format-color-fill' size = { theme.sizes.sm }/>
                 </TouchableOpacity>
             </View>
-            {showColorPicker ? (
+            {showColorPicker && (
                 <View style = { [ style.marginTop ] } >
-                    <ColorPicker onChangeJS = { (colors) => { setColor(colors.rgba); }} value = { initialColor } >
+                    <ColorPicker onChangeJS = { (colors) => updateColor(colors.rgba) } value = { initialColor } >
                         <Panel5 style = { [ style.border ] } />
                     </ColorPicker>
                 </View>
-            ) : (
-                <></>
             )}
         </>
     );

@@ -19,8 +19,8 @@ import { useTheme } from '../styles/theme';
 
 // type definitions
 type Props = {
-    subBlock: TimerSubBlock;
-    onChange: () => void;
+    subBlock: TimerSubBlock,
+    onChange: () => void,
 };
 
 // component
