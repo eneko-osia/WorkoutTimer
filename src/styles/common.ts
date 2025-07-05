@@ -72,6 +72,10 @@ export const useStyles = (theme: Theme) => {
             borderWidth: scale(2),
             padding: theme.spacing.xs,
         },
+        preview: {
+            width: '100%',
+            height: '100%',
+        },
         row: {
             alignItems: 'center',
             flexDirection: 'row',
