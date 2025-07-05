@@ -161,6 +161,9 @@ export const useStyles = (theme: Theme) => {
         normal: {
             fontSize: theme.fontSizes.md,
         },
+        fixWidth: {
+            width: theme.spacing.xxl
+        },
         xxsmall: {
             fontSize: theme.fontSizes.xxs,
         },
