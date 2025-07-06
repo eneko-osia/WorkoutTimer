@@ -1,5 +1,5 @@
 // react imports
-import React, { useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import {
     Alert,
     Platform,
@@ -21,8 +21,8 @@ import TimerSubBlockEditor from './TimerSubBlockEditor';
 // type definitions
 type Props = {
     workout: Workout,
-    block: TimerBlock;
-    onChange: () => void;
+    block: TimerBlock,
+    onChange: () => void,
 };
 
 // component
@@ -38,27 +38,27 @@ export default function TimerBlockEditor({ workout, block, onChange }: Props) {
     })
 
     // attributes
-    const timer = useRef<NodeJS.Timeout>(null);
+    const timerRef = useRef<NodeJS.Timeout>(null);
 
     // methods
-    const createSubBlock = (blockId: number) => {
+    const createSubBlock = useCallback((blockId: number) => {
         workout.createSubBlock(blockId, 'New Block');
         onChange();
-    };
+    }, [ workout, onChange ]);
 
-    const deleteSubBlock = (blockId: number, subBlockId: number) => {
+    const deleteSubBlock = useCallback((blockId: number, subBlockId: number) => {
         workout.deleteSubBlock(blockId, subBlockId);
         onChange();
-    };
+    }, [ workout, onChange ]);
 
-    const moveSubBlock = (fromIndex: number, toIndex: number) => {
+    const moveSubBlock = useCallback((fromIndex: number, toIndex: number) => {
         if (fromIndex === toIndex) { return; }
         const [ item ] = block.subBlocks.splice(fromIndex, 1);
         block.subBlocks.splice(toIndex, 0, item);
         onChange();
-    }
+    }, [ block, onChange ]);
 
-    const removeSubBlock = (blockId: number, subBlock: TimerSubBlock) => {
+    const removeSubBlock = useCallback((blockId: number, subBlock: TimerSubBlock) => {
         if (Platform.OS === 'web') {
             deleteSubBlock(blockId, subBlock.id);
         }
@@ -71,24 +71,56 @@ export default function TimerBlockEditor({ workout, block, onChange }: Props) {
                 { text: 'Delete', style: 'destructive', onPress: () => { deleteSubBlock(blockId, subBlock.id); } }
             ]);
         }
-    }
+    }, [ deleteSubBlock ]);
 
-    const decreaseSets = (timeout: number = 250) => {
+    const decreaseSets = useCallback((timeout: number = 250) => {
         block.sets = Math.max(Workout.kMinSets, block.sets - 1)
-        timer.current = setTimeout(() => { decreaseSets(Math.max(1, timeout - 10)) }, timeout);
+        timerRef.current = setTimeout(() => { decreaseSets(Math.max(1, timeout - 10)) }, timeout);
         onChange();
-    };
+    }, [ block, onChange ]);
 
-    const increaseSets = (timeout: number = 250) => {
+    const increaseSets = useCallback((timeout: number = 250) => {
         block.sets = Math.min(Workout.kMaxSets, block.sets + 1)
-        timer.current = setTimeout(() => { increaseSets(Math.max(1, timeout - 10)) }, timeout);
+        timerRef.current = setTimeout(() => { increaseSets(Math.max(1, timeout - 10)) }, timeout);
         onChange();
-    };
+    }, [ block, onChange ]);
 
-    const stopTimer = () => {
-        clearTimeout(timer.current!);
-        timer.current = null;
-    }
+    const stopTimer = useCallback(() => {
+        clearTimeout(timerRef.current!);
+        timerRef.current = null;
+    }, []);
+
+    const renderSubBlockItem = ({ item, index }: any) => (
+        <View style = { [ style.secondary, style.row, style.marginVertical, style.padding, style.border, style.outline ] } key = { item.id }>
+            <View style = { [ style.secondary, style.flex1 ] }>
+                <TimerSubBlockEditor
+                    subBlock = { item }
+                    onChange = { onChange }
+                />
+            </View>
+            <View style = { [ style.line, style.marginHorizontal ] } />
+            <View style = { [ style.secondary ] }>
+                <TouchableOpacity style = { [ style.quaternary, style.paddingHorizontal, style.button, (index === 0 ?  style.disabled : {}), style.border, style.outline ] }
+                    disabled = { index === 0 }
+                    onPress = { () => { moveSubBlock(index, Math.max(0, index - 1)); } }
+                >
+                    <MaterialIcons name = 'arrow-upward' size = { theme.sizes.sm }/>
+                </TouchableOpacity>
+                <TouchableOpacity style = { [ style.quaternary, style.marginTop, style.padding, style.button, (block.subBlocks.length <= 1 ?  style.disabled : {}), style.border, style.outline ] }
+                    disabled = { block.subBlocks.length <= 1 }
+                    onPress = { () => { removeSubBlock(block.id, item); } }
+                >
+                    <MaterialIcons name = 'delete' size = { theme.sizes.sm }/>
+                </TouchableOpacity>
+                <TouchableOpacity style = { [ style.quaternary, style.marginTop, style.paddingHorizontal, (index === (block.subBlocks.length - 1) ?  style.disabled : {}), style.button, style.border, style.outline ] }
+                    disabled = { index === (block.subBlocks.length - 1) }
+                    onPress = { () => { moveSubBlock(index, Math.min((block.subBlocks.length - 1), index + 1)); } }
+                >
+                    <MaterialIcons name = 'arrow-downward' size = { theme.sizes.sm }/>
+                </TouchableOpacity>
+            </View>
+        </View>
+    );
 
     // jsx
     return (
@@ -125,37 +157,7 @@ export default function TimerBlockEditor({ workout, block, onChange }: Props) {
                 keyExtractor = { (item) => item.id.toString() }
                 scrollEnabled = { false }
                 itemLayoutAnimation = { LinearTransition }
-                renderItem = {({ item, index }) => (
-                    <View style = { [ style.secondary, style.row, style.marginVertical, style.padding, style.border, style.outline ] } key = { item.id }>
-                        <View style = { [ style.secondary, style.flex1 ] }>
-                            <TimerSubBlockEditor
-                                subBlock = { item }
-                                onChange = { onChange }
-                            />
-                        </View>
-                        <View style = { [ style.line, style.marginHorizontal ] } />
-                        <View style = { [ style.secondary ] }>
-                            <TouchableOpacity style = { [ style.quaternary, style.paddingHorizontal, style.button, (index === 0 ?  style.disabled : {}), style.border, style.outline ] }
-                                disabled = { index === 0 }
-                                onPress = { () => { moveSubBlock(index, Math.max(0, index - 1)); } }
-                            >
-                                <MaterialIcons name = 'arrow-upward' size = { theme.sizes.sm }/>
-                            </TouchableOpacity>
-                            <TouchableOpacity style = { [ style.quaternary, style.marginTop, style.padding, style.button, (block.subBlocks.length <= 1 ?  style.disabled : {}), style.border, style.outline ] }
-                                disabled = { block.subBlocks.length <= 1 }
-                                onPress = { () => { removeSubBlock(block.id, item); } }
-                            >
-                                <MaterialIcons name = 'delete' size = { theme.sizes.sm }/>
-                            </TouchableOpacity>
-                            <TouchableOpacity style = { [ style.quaternary, style.marginTop, style.paddingHorizontal, (index === (block.subBlocks.length - 1) ?  style.disabled : {}), style.button, style.border, style.outline ] }
-                                disabled = { index === (block.subBlocks.length - 1) }
-                                onPress = { () => { moveSubBlock(index, Math.min((block.subBlocks.length - 1), index + 1)); } }
-                            >
-                                <MaterialIcons name = 'arrow-downward' size = { theme.sizes.sm }/>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                )}
+                renderItem = { renderSubBlockItem }
             />
         </>
     );

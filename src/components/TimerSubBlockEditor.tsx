@@ -1,7 +1,6 @@
 // react imports
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import {
-    StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
@@ -19,8 +18,8 @@ import { useTheme } from '../styles/theme';
 
 // type definitions
 type Props = {
-    subBlock: TimerSubBlock;
-    onChange: () => void;
+    subBlock: TimerSubBlock,
+    onChange: () => void,
 };
 
 // component
@@ -30,32 +29,29 @@ export default function TimerSubBlockEditor({ subBlock, onChange }: Props) {
 
     // theme
     const theme = useTheme(scheme);
-    const style = StyleSheet.create({
-        ...useStyles(theme),
-        fixWidth: { width: theme.spacing.xxl },
-    })
+    const style = useStyles(theme);
 
     // attributes
     const [showColorPicker, setShowColorPicker] = useState(false);
-    const timer                                 = useRef<NodeJS.Timeout>(null);
+    const timerRef                              = useRef<NodeJS.Timeout>(null);
 
     // methods
-    const decreaseDuration = (timeout: number = 250) => {
+    const decreaseDuration = useCallback((timeout: number = 250) => {
         subBlock.duration = Math.max(Workout.kMinDuration, subBlock.duration - 1)
-        timer.current = setTimeout(() => { decreaseDuration(Math.max(1, timeout - 10)) }, timeout);
+        timerRef.current = setTimeout(() => { decreaseDuration(Math.max(1, timeout - 10)) }, timeout);
         onChange();
-    };
+    }, [ subBlock, onChange ]);
 
-    const increaseDuration = (timeout: number = 250) => {
+    const increaseDuration = useCallback((timeout: number = 250) => {
         subBlock.duration = Math.min(Workout.kMaxDuration, subBlock.duration + 1)
-        timer.current = setTimeout(() => { increaseDuration(Math.max(1, timeout - 10)) }, timeout);
+        timerRef.current = setTimeout(() => { increaseDuration(Math.max(1, timeout - 10)) }, timeout);
         onChange();
-    };
+    }, [ subBlock, onChange ]);
 
-    const stopTimer = () => {
-        clearTimeout(timer.current!);
-        timer.current = null;
-    }
+    const stopTimer = useCallback(() => {
+        clearTimeout(timerRef.current!);
+        timerRef.current = null;
+    }, []);
 
     // jsx
     return (
